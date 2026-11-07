@@ -1,6 +1,6 @@
 """Export the perturbation test (results/perturbations.csv) for vis/findings.html.
 
-Writes vis/perturbation_data.js:
+Writes vis/perturbation_data.js (both tests: perturbation_test.py and perturbation_test2.py):
   rows      [idx, kind_index, pred] for every tested image and edit
   kinds     names of the edits
   examples  before/after image pairs (base64 JPEG) for the page
@@ -19,7 +19,7 @@ import pandas as pd
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
-from model import ROOT, CLASS_NAMES  # noqa: E402
+from model import ROOT, REPO, CLASS_NAMES  # noqa: E402
 from perturbation_test import KINDS, perturb  # noqa: E402
 
 
@@ -53,16 +53,32 @@ def main():
         picks.append(("rotate", int(i), "rot90"))
 
     ex = []
-    with h5py.File(ROOT / "data" / "Galaxy10_DECals.h5", "r") as f:
+    with h5py.File(REPO / "data" / "Galaxy10_DECals.h5", "r") as f:
         for group, i, kind in picks:
             im = f["images"][i]
             ex.append({"group": group, "idx": i, "kind": kind,
                        "before": b64(im), "after": b64(perturb(im, kind)),
                        "pred_before": int(w.at[i, "original"]), "pred_after": int(w.at[i, kind])})
 
+    # second test (perturbation_test2.py): blur / squash / shift / no_context / add_neighbour
+    from perturbation_test2 import KINDS as KINDS2, perturb as perturb2
+    p2 = pd.read_csv(ROOT / "results" / "perturbations2.csv")
+    w2 = p2.pivot(index="idx", columns="perturbation", values="pred").join(
+        p2.drop_duplicates("idx").set_index("idx")[["label5"]])
+    pb = p2[p2.perturbation == "blur"].set_index("idx")["p_Elliptical"]
+    s2 = w2[(w2.label5 == 0) & (w2.original == 0) & (w2.blur == 1)]
+    with h5py.File(REPO / "data" / "Galaxy10_DECals.h5", "r") as f:
+        for i in pb.loc[s2.index].sort_values(ascending=False).index[:3]:
+            im = f["images"][int(i)]
+            ex.append({"group": "blur", "idx": int(i), "kind": "blur", "before": b64(im), "after": b64(perturb2(im, "blur")),
+                       "pred_before": int(w2.at[i, "original"]), "pred_after": int(w2.at[i, "blur"])})
+
     kidx = {k: j for j, k in enumerate(KINDS)}
+    kidx2 = {k: j for j, k in enumerate(KINDS2)}
     data = {"kinds": KINDS, "classes": CLASS_NAMES,
             "rows": [[int(r.idx), kidx[r.perturbation], int(r.pred)] for r in p.itertuples()],
+            "kinds2": KINDS2,
+            "rows2": [[int(r.idx), kidx2[r.perturbation], int(r.pred)] for r in p2.itertuples()],
             "examples": ex}
     out = ROOT / "vis" / "perturbation_data.js"
     out.write_text("window.PERTURB_DATA = " + json.dumps(data, separators=(",", ":")) + ";\n", encoding="utf-8")

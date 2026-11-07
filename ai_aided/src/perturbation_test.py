@@ -26,7 +26,7 @@ import torch
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
-from model import ROOT, CLASS_NAMES, TRANSFORM, load_model  # noqa: E402
+from model import ROOT, REPO, CLASS_NAMES, TRANSFORM, load_model  # noqa: E402
 
 N = 256
 
@@ -77,7 +77,7 @@ def main():
     meta = df.set_index("idx").loc[sel, ["label5", "label10"]]
     model = load_model()
     rows = []
-    with h5py.File(ROOT / "data" / "Galaxy10_DECals.h5", "r") as f:
+    with h5py.File(REPO / "data" / "Galaxy10_DECals.h5", "r") as f:
         for b in range(0, len(sel), 32):
             ids = sel[b:b + 32]
             imgs = f["images"][ids]

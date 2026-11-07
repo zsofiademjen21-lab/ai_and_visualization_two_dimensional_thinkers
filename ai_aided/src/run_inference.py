@@ -22,9 +22,9 @@ import torch
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
-from model import ROOT, CLASS_NAMES, GALAXY10_TO_5, TRANSFORM, load_model  # noqa: E402
+from model import ROOT, REPO, CLASS_NAMES, GALAXY10_TO_5, TRANSFORM, load_model  # noqa: E402
 
-DATA = ROOT / "data" / "Galaxy10_DECals.h5"
+DATA = REPO / "data" / "Galaxy10_DECals.h5"
 OUT = ROOT / "results"
 VAL_SPLIT, SEED = 0.2, 42
 

@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
-from model import ROOT  # noqa: E402
+from model import ROOT, REPO  # noqa: E402
 
 N = 256
 YY, XX = np.mgrid[:N, :N].astype(np.float32)
@@ -70,7 +70,7 @@ def props(imgs):
 
 def main():
     out = []
-    with h5py.File(ROOT / "data" / "Galaxy10_DECals.h5", "r") as h:
+    with h5py.File(REPO / "data" / "Galaxy10_DECals.h5", "r") as h:
         n = len(h["ans"])
         z = h["redshift"][:]
         for b in range(0, n, 128):

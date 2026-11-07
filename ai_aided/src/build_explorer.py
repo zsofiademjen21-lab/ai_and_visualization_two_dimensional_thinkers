@@ -20,7 +20,7 @@ from PIL import Image
 from sklearn.manifold import TSNE
 
 sys.path.insert(0, str(Path(__file__).parent))
-from model import ROOT, CLASS_NAMES, GALAXY10_NAMES, GALAXY10_TO_5  # noqa: E402
+from model import ROOT, REPO, CLASS_NAMES, GALAXY10_NAMES, GALAXY10_TO_5  # noqa: E402
 
 RES, VIS = ROOT / "results", ROOT / "vis"
 THUMB = 64
@@ -73,7 +73,7 @@ def main():
 
     # --- thumbnails for validation images ---
     thumbs = {}
-    with h5py.File(ROOT / "data" / "Galaxy10_DECals.h5", "r") as f:
+    with h5py.File(REPO / "data" / "Galaxy10_DECals.h5", "r") as f:
         ids = np.sort(df.loc[val, "idx"].to_numpy())
         for b in range(0, len(ids), 256):
             chunk = ids[b:b + 256]

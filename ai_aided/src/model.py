@@ -13,8 +13,9 @@ import torch.nn as nn
 import timm
 from torchvision import transforms
 
-ROOT = Path(__file__).resolve().parents[1]
-CKPT_PATH = ROOT / "models" / "zoobot_finetuned.ckpt"
+ROOT = Path(__file__).resolve().parents[1]          # ai_aided/ (results, vis)
+REPO = Path(__file__).resolve().parents[2]          # repo root (shared data/, models/)
+CKPT_PATH = REPO / "models" / "zoobot_finetuned.ckpt"
 HF_REPO, HF_FILE = "zev-walker/astrovision-advanced", "zoobot_finetuned.ckpt"
 
 CLASS_NAMES = ["Spiral", "Elliptical", "Edge-on Disk", "Irregular", "Merger"]

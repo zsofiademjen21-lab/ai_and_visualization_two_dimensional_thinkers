@@ -29,7 +29,7 @@ AI tool: Claude Code (Claude Opus 5.5)
 
 **Prompt:** "can you help with the visualization?"
 
-**What Claude did:** It built one interactive page (`vis/explorer.html`) with linked views:
+**What Claude did:** It built one interactive page (`ai_aided/vis/explorer.html`) with linked views:
 - a confusion matrix (5 or 10 classes)
 - recall bars
 - a 2D map of the galaxies
@@ -84,7 +84,7 @@ This follows from the suggestion in 3.
 
 **Prompt:** "can you visualize your findings?"
 
-**What Claude did:** It made `vis/findings.html`. Each finding gets one chart and real example galaxies, and all numbers are calculated from the data.
+**What Claude did:** It made `ai_aided/vis/findings.html`. Each finding gets one chart and real example galaxies, and all numbers are calculated from the data.
 
 **What went wrong:** When checking the page against the data, two of Claude's own sentences were wrong:
 - It called Disturbed the "third-rarest" class, but it's the second-rarest.
@@ -102,7 +102,7 @@ Both were corrected.
 
 **What Claude did:**
 - It checked colour, distance and neighbours in the data.
-- It found that red Irregulars are called Elliptical much more often than blue ones. Size, colour and distance are all mixed together in real data, though, so it suggested a test: edit the images directly. It made the galaxies redder or bluer, removed the colour, shrank them, or rotated them, and compared the predictions (`src/perturbation_test.py`, 705 validation galaxies).
+- It found that red Irregulars are called Elliptical much more often than blue ones. Size, colour and distance are all mixed together in real data, though, so it suggested a test: edit the images directly. It made the galaxies redder or bluer, removed the colour, shrank them, or rotated them, and compared the predictions (`ai_aided/src/perturbation_test.py`, 705 validation galaxies).
 - It looked through the 40 most confident mistakes.
 
 **Results:**
@@ -121,9 +121,50 @@ Both were corrected.
 
 **Prompt:** "Add them to the visualisations"
 
-**What Claude did:** It added the new findings to `vis/findings.html`, which now has 5 takeaways. The three findings from the image-editing test are marked "tested by editing images". Each one shows before/after pairs of the same galaxy with the model's answer. The label-noise point is shown as "still to check", because it is only Claude's first visual impression.
+**What Claude did:** It added the new findings to `ai_aided/vis/findings.html`, which now has 5 takeaways. The three findings from the image-editing test are marked "tested by editing images". Each one shows before/after pairs of the same galaxy with the model's answer. The label-noise point is shown as "still to check", because it is only Claude's first visual impression.
 
 **My decision:** Accepted. The before/after images make the experiment easy to understand without any statistics.
+
+---
+
+## 8. Searching for more findings
+
+**Prompt:** "could you search for more findings?"
+
+**What Claude did:** First it checked the existing results again, comparing training images with new images, distance, and the model's second choice:
+1. The model memorised the rare classes instead of learning them. Disturbed galaxies are 74% correct on training images but only 56% on new ones, and Cigar-shaped 97% vs 85%. For the common classes the gap is at most 5 points. Even on its own training images the model gets 26% of disturbed galaxies wrong, which also fits the idea that these labels are inconsistent.
+2. Distance alone doesn't matter. Accuracy is 92–94% from the nearest to the farthest galaxies.
+3. Most mistakes are near misses. In 82% of them, the correct class is the model's second choice.
+
+Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py`, 1,115 galaxies). It blurs the images, squashes round galaxies flat, removes the surroundings or adds a neighbour galaxy, and moves the galaxy off-centre.
+
+**What went wrong:** In the preview, two of the edits looked artificial. The added neighbour had a visible square box around it, and the "remove surroundings" edit had a hard circle edge that also cut off large galaxies. The model could have reacted to these artefacts instead of the real change. Claude fixed both before running the test.
+
+**Results of the second test:**
+1. Blurring (same size, less detail) makes spirals look like ellipticals to the model (1% → 10%). So it's the loss of detail that matters, not the size itself.
+2. Squashing round ellipticals flat almost never makes the model say Edge-on (1.5%). Being elongated alone isn't enough, so the model needs real disk features. This makes the earlier Cigar-shaped idea weaker.
+3. Removing the surroundings or adding a small neighbour galaxy barely changes anything (Mergers stay at 90–91%). The model isn't fooled by an added companion. Real merger pairs are very close together, though, so this only shows that distant surroundings don't matter.
+4. Disturbed galaxies are the least stable under every harmless edit: blur changes 38% of the answers, moving off-centre 17%, rotating 13%. For the other classes it's mostly 2–10%.
+
+**My decision:** Accepted. Finding 2 shows that a test can also weaken an earlier idea, not just confirm it.
+
+---
+
+## 9. Adding the second test to the visualisation
+
+**Prompt:** "add this too to the visualisation"
+
+**What Claude did:** It reorganised `ai_aided/vis/findings.html` into 6 takeaways so the page stays simple:
+1. Disturbed galaxies are hard for the model.
+2. Losing detail makes galaxies look like ellipticals (shrink and blur tests, with before/after images).
+3. Small, harmless changes (rotate, move, blur) flip the answer for disturbed galaxies.
+4. The model memorised the rare classes (training vs new images).
+5. The model is often very sure when it is wrong.
+6. What does *not* confuse the model: colour, shape alone, neighbours, surroundings and distance, shown as simple "before → after" numbers.
+
+**What went wrong:** In the first version, the "distance" row sat in the "tested by editing images" card although it comes from the real images. Claude added a label so it isn't mistaken for an experiment.
+
+**My decision:** Accepted. Putting all the "this doesn't matter" results in one card keeps the page short.
 
 ---
 
@@ -133,6 +174,7 @@ Both were corrected.
 - Numbers can look reasonable but come from a wrong calculation (the measurement bug).
 - The AI fills gaps in the task with "standard practice", even when that breaks the task rules (Phase II drift).
 - AI-written summaries can choose comparisons that make results look stronger than they are.
+- Edited test images can contain artefacts (boxes, hard edges) that the model may react to instead of the real change.
 
 ## Best practices
 
