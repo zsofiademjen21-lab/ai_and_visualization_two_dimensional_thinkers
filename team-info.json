@@ -1,13 +1,34 @@
 {
-    "team_name": "Team Name",
+    "team_name": "Two Dimensional Thinkers",
     "students": [
         {
-            "student_id": "k00000000",
-            "first_name": "First",
-            "last_name": "Last",
+            "student_id": "k12413807",
+            "first_name": "Zsófia",
+            "last_name": "Demjén-Nagy",
+            "email": "zsofia.demjen21@gmail.com",
+            "github_user": "zsofiademjen21-lab"
+        },
+        {
+            "student_id": "k09956227",
+            "first_name": "Livia",
+            "last_name": "Koch",
             "email": "first.last@mail.com",
             "github_user": "mygitusername"
         },
-        // ...add a record for each student
+        {
+            "student_id": "k12141900",
+            "first_name": "Daniel",
+            "last_name": "Morgunov",
+            "email": "first.last@mail.com",
+            "github_user": "mygitusername"
+        },
+        {
+            "student_id": "K12245534",
+            "first_name": "Bence",
+            "last_name": "Kovács",
+            "email": "first.last@mail.com",
+            "github_user": "mygitusername"
+        }
+        
     ]
 }

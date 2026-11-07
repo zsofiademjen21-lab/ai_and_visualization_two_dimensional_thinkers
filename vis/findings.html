@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AstroVision Key Takeaways</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface-1: #fcfcfb; --surface-2: #f0efec;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781; --grid: #e1e0d9; --ring: rgba(11,11,11,0.10);
+  --hi: #eb6834; --base: #c3c2b7; --c0: #2a78d6; --c1: #eb6834;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface-1: #1a1a19; --surface-2: #262624;
+    --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --ring: rgba(255,255,255,0.10);
+    --hi: #d95926; --base: #4a4a46; --c0: #3987e5; --c1: #d95926;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface-1: #1a1a19; --surface-2: #262624;
+  --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --ring: rgba(255,255,255,0.10);
+  --hi: #d95926; --base: #4a4a46; --c0: #3987e5; --c1: #d95926;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 36px 16px 56px; }
+h1 { font-size: 28px; margin: 0 0 8px; }
+.lede { color: var(--ink-2); margin: 0 0 28px; }
+.card { background: var(--surface-1); border: 1px solid var(--ring); border-radius: 14px; padding: 24px; margin-bottom: 22px; }
+.num { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+h2 { font-size: 22px; margin: 4px 0 8px; line-height: 1.3; }
+.say { color: var(--ink-2); margin: 0 0 18px; }
+.say b { color: var(--ink); }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { fill: var(--ink-2); font-size: 14px; }
+.ex-t { font-size: 14px; color: var(--ink-2); margin: 20px 0 8px; }
+.ex { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 600px) { .ex { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ex figure { margin: 0; }
+.ex img { width: 100%; aspect-ratio: 1; border-radius: 8px; display: block; }
+.ex figcaption { font-size: 12px; color: var(--ink-2); margin-top: 4px; line-height: 1.3; }
+.note { font-size: 14px; color: var(--ink-2); background: var(--surface-2); border-radius: 8px; padding: 10px 14px; margin-top: 18px; }
+.foot { color: var(--muted); font-size: 13px; margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>What we found: 3 key takeaways</h1>
+  <p class="lede" id="lede"></p>
+
+  <section class="card">
+    <div class="num">Takeaway 1</div>
+    <h2>The model often fails to recognise disturbed galaxies</h2>
+    <p class="say" id="t1-say"></p>
+    <div id="t1-chart"></div>
+    <p class="ex-t">Examples: disturbed galaxies the model got wrong</p>
+    <div class="ex" id="t1-ex"></div>
+  </section>
+
+  <section class="card">
+    <div class="num">Takeaway 2</div>
+    <h2>Small disturbed galaxies get mistaken for ellipticals</h2>
+    <p class="say" id="t2-say"></p>
+    <div id="t2-chart"></div>
+    <p class="ex-t">Examples: small disturbed galaxies the model called Elliptical</p>
+    <div class="ex" id="t2-ex"></div>
+    <p class="note">Likely reason: in a small image the disturbed structure isn't visible, so the galaxy looks like a smooth blob, which is what an elliptical looks like.</p>
+  </section>
+
+  <section class="card">
+    <div class="num">Takeaway 3</div>
+    <h2>The model is often very sure even when it is wrong</h2>
+    <p class="say" id="t3-say"></p>
+    <div id="t3-chart"></div>
+    <p class="ex-t">Examples: the model's most confident mistakes (true label → model's answer)</p>
+    <div class="ex" id="t3-ex"></div>
+    <p class="note">Some of these may be wrong labels rather than model mistakes. For example, some "spirals" are clearly two galaxies merging. We still need to check them by hand.</p>
+  </section>
+
+  <p class="foot">Data: Galaxy10 DECals validation images (not used for training). Numbers are calculated live from the model's predictions. For details, open explorer.html.</p>
+</div>
+
+<script src="explorer_data.js"></script>
+<script src="thumbs.js"></script>
+<script>
+(() => {
+const D = window.EXPLORER_DATA, T = window.EXPLORER_THUMBS || {};
+const C5 = D.classes, C10 = D.classes10;
+const R = D.rows.map(r => ({ idx: r[0], split: r[1], l10: r[2], l5: r[3], pred: r[4], q: r[7] || [], conf: Math.max(...r[5]) }));
+const VAL = R.filter(d => d.split === 0), TR = R.filter(d => d.split === 1);
+const ok = d => d.pred === d.l5, $ = id => document.getElementById(id);
+const pct = v => Math.round(100 * v) + "%";
+const SIZE = 1;
+const share = (arr, f) => arr.filter(f).length / arr.length;
+const NICE = { 0: "Disturbed", 1: "Merger", 2: "Round elliptical", 3: "Elliptical", 4: "Cigar elliptical", 5: "Barred spiral",
+  6: "Spiral", 7: "Loose spiral", 8: "Edge-on disk", 9: "Edge-on disk" };
+
+function examples(id, items, cap) {
+  $(id).innerHTML = items.map(d => `<figure><img src="data:image/jpeg;base64,${T[d.idx]}" alt=""><figcaption>${cap(d)}</figcaption></figure>`).join("");
+}
+// simple horizontal bars: [{label, v, hi}]
+function bars(id, rows, max = 1) {
+  const LW = 230, BW = 440, BH = 46, W = LW + BW + 60, H = rows.length * BH;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  rows.forEach((r, i) => {
+    const y = i * BH, w = Math.max(2, r.v / max * BW);
+    s += `<text x="${LW - 12}" y="${y + 28}" text-anchor="end" style="fill:var(--ink)${r.hi ? ";font-weight:600" : ""}">${r.label}</text>
+      <rect x="${LW}" y="${y + 10}" width="${BW}" height="24" rx="6" fill="var(--surface-2)"/>
+      <rect x="${LW}" y="${y + 10}" width="${w}" height="24" rx="6" fill="${r.hi ? "var(--hi)" : "var(--base)"}"/>
+      <text x="${LW + w + 10}" y="${y + 28}" style="fill:var(--ink);font-weight:600;font-size:16px">${pct(r.v)}</text>`;
+  });
+  $(id).innerHTML = s + "</svg>";
+}
+
+$("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocaleString()} galaxy images it had not been trained on. Overall it is right ${pct(share(VAL, ok))} of the time, the same as the author reports. But that single number hides three important problems.`;
+
+// ---------- 1 ----------
+{
+  const dist = VAL.filter(d => d.l10 === 0), rest = VAL.filter(d => d.l10 !== 0);
+  const asSp = share(dist, d => d.pred === 0), asEl = share(dist, d => d.pred === 1);
+  bars("t1-chart", [
+    { label: "All other galaxy types", v: share(rest, ok) },
+    { label: "Disturbed galaxies", v: share(dist, ok), hi: true },
+  ]);
+  $("t1-say").innerHTML = `It recognises <b>only ${pct(share(dist, ok))}</b> of disturbed galaxies, compared with ${pct(share(rest, ok))} for all other types. When it gets them wrong, it mostly calls them <b>Spiral (${pct(asSp)})</b> or <b>Elliptical (${pct(asEl)})</b>. Disturbed galaxies are also rare in the training data, so the model has had less practice with them.`;
+  const wrong = dist.filter(d => !ok(d)).sort((a, b) => b.conf - a.conf);
+  const pick = [...wrong.filter(d => d.pred === 0).slice(0, 3), ...wrong.filter(d => d.pred === 1).slice(0, 3)];
+  examples("t1-ex", pick, d => `called ${C5[d.pred]}`);
+}
+
+// ---------- 2 ----------
+{
+  const dist = VAL.filter(d => d.l10 === 0 && d.q[SIZE] != null).sort((a, b) => a.q[SIZE] - b.q[SIZE]);
+  const cut = Math.round(dist.length * 0.4), small = dist.slice(0, cut), large = dist.slice(cut);
+  const tr = TR.filter(d => d.l10 === 0 && d.q[SIZE] != null).sort((a, b) => a.q[SIZE] - b.q[SIZE]);
+  const tc = Math.round(tr.length * 0.4);
+  const sE = share(small, d => d.pred === 1), lE = share(large, d => d.pred === 1);
+  bars("t2-chart", [
+    { label: "Larger disturbed galaxies", v: lE },
+    { label: "Small disturbed galaxies", v: sE, hi: true },
+  ], 0.5);
+  $("t2-say").innerHTML = `Of the smallest disturbed galaxies, <b>${pct(sE)} are called Elliptical</b>. For the larger ones it's only ${pct(lE)}. The chart shows how often each group is called Elliptical. We see the same pattern in the training data (${pct(share(tr.slice(0, tc), d => d.pred === 1))} vs ${pct(share(tr.slice(tc), d => d.pred === 1))}), so it isn't a coincidence.`;
+  examples("t2-ex", small.filter(d => d.pred === 1).sort((a, b) => b.conf - a.conf).slice(0, 6), d => `called Elliptical, ${pct(d.conf)} sure`);
+}
+
+// ---------- 3 ----------
+{
+  const wrong = VAL.filter(d => !ok(d)), sure = wrong.filter(d => d.conf >= 0.9);
+  bars("t3-chart", [
+    { label: "Mistakes, less than 90% sure", v: 1 - sure.length / wrong.length },
+    { label: "Mistakes, 90% sure or more", v: sure.length / wrong.length, hi: true },
+  ]);
+  $("t3-say").innerHTML = `Of its ${wrong.length} mistakes, <b>${sure.length} (about 1 in 3)</b> were made while the model was at least 90% sure. So you can't rely on its confidence to spot when it's wrong. Almost half of these confident mistakes (${sure.filter(d => d.l10 === 0).length}) are disturbed galaxies again.`;
+  examples("t3-ex", sure.sort((a, b) => b.conf - a.conf).slice(0, 6), d => `${NICE[d.l10]} → ${C5[d.pred]}`);
+}
+})();
+</script>
+</body>
+</html>
