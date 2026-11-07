@@ -27,7 +27,8 @@ The checkpoint (180 MB) is downloaded automatically into `models/` the first tim
 | 1. Inference on all 17,736 images (about 40 min on CPU) | `python src/run_inference.py` | `results/predictions.csv`, `results/features.npy` |
 | 2. Measure input-image properties (size, axis ratio, colour, …; a few min) | `python src/input_properties.py` | `results/input_props.csv` |
 | 3. Build the explorer data (t-SNE of output probabilities, thumbnails) | `python src/build_explorer.py` | `vis/explorer_data.js`, `vis/thumbs.js` |
-| 4. Explore | open `vis/explorer.html` in a browser | |
+| 4. Image-editing test (shrink / recolour / rotate; ~10 min) | `python src/perturbation_test.py` then `python src/build_findings_data.py` | `results/perturbations.csv`, `vis/perturbation_data.js` |
+| 5. Explore | open `vis/explorer.html` in a browser | |
 
 `predictions.csv` has one row per image with these columns:
 - `idx`: row in the h5 file
@@ -51,7 +52,8 @@ The checkpoint (180 MB) is downloaded automatically into `models/` the first tim
 src/model.py           model loader, class names, label mapping, preprocessing
 src/run_inference.py   predictions + embeddings for every image
 src/build_explorer.py  data for the interactive explorer
+src/perturbation_test.py synthetic test: recolour / shrink / rotate images, compare predictions
 vis/explorer.html      Phase I (black-box) linked views: confusion matrix, recall, output map, calibration, gallery
-vis/findings.html      Phase I findings: one chart + example galaxies per finding
+vis/findings.html      Phase I key takeaways: one chart + example galaxies per takeaway
 ai-interactions/       AI-use log (AI-aided pair)
 ```

@@ -96,6 +96,37 @@ Both were corrected.
 
 ---
 
+## 6. Further findings
+
+**Prompt:** "Can you find further findings?"
+
+**What Claude did:**
+- It checked colour, distance and neighbours in the data.
+- It found that red Irregulars are called Elliptical much more often than blue ones. Size, colour and distance are all mixed together in real data, though, so it suggested a test: edit the images directly. It made the galaxies redder or bluer, removed the colour, shrank them, or rotated them, and compared the predictions (`src/perturbation_test.py`, 705 validation galaxies).
+- It looked through the 40 most confident mistakes.
+
+**Results:**
+1. Changing the colour barely changes the predictions. The colour pattern was only a side effect, not what the model uses.
+2. Shrinking a galaxy really does make the model call it Elliptical more often. Spirals go from 1% to 14%. This confirms the size finding.
+3. Just rotating the image changes 13% of the Irregular predictions, although the model was trained on rotated images. The Irregular predictions are fragile.
+4. In Claude's view, about 16 of the 40 most confident mistakes look like wrong labels (for example "Disturbed" galaxies that look like normal spirals). This still needs our own check.
+
+**What went wrong:** The first version of the shrink test filled the empty space with flat grey. That looks artificial, and the model could react to it instead of the size. Claude saw it in a preview and changed it to real sky pixels.
+
+**My decision:** Accepted. The colour result was important: without the test we would have reported a colour shortcut that isn't real.
+
+---
+
+## 7. Adding the new findings to the visualisation
+
+**Prompt:** "Add them to the visualisations"
+
+**What Claude did:** It added the new findings to `vis/findings.html`, which now has 5 takeaways. The three findings from the image-editing test are marked "tested by editing images". Each one shows before/after pairs of the same galaxy with the model's answer. The label-noise point is shown as "still to check", because it is only Claude's first visual impression.
+
+**My decision:** Accepted. The before/after images make the experiment easy to understand without any statistics.
+
+---
+
 ## Failure patterns we saw
 
 - Generated code can contain small bugs even when it looks fine.
@@ -110,3 +141,5 @@ Both were corrected.
 - Check every number against something you already know is true.
 - Look at the rendered charts, not just the code.
 - Re-read every claim the AI writes against the actual numbers in the chart.
+- Don't trust a pattern in the data alone. Test it by changing the input (the colour pattern turned out to be false).
+- Look at the edited test images before running the test.
