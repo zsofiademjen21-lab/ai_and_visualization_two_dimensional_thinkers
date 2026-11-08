@@ -34,6 +34,7 @@ Run these from this folder (`ai_aided/`):
 | 3. Build the explorer data | `python src/build_explorer.py` | `vis/explorer_data.js`, `vis/thumbs.js` |
 | 4. Image-editing tests (about 10 + 15 min) | `python src/perturbation_test.py`, `python src/perturbation_test2.py` | `results/perturbations.csv`, `results/perturbations2.csv` |
 | 5. Build the findings data | `python src/build_findings_data.py`, `python src/build_map_data.py` | `vis/perturbation_data.js`, `vis/map_data.js` |
+| 6. Volunteer votes and label check (download the catalogues first, see `src/volunteer_votes.py`) | `python src/volunteer_votes.py`, then `python src/build_label_check.py` | `results/volunteer_votes.csv`, `vis/label_check_data.js` |
 
 `predictions.csv` has one row per image with these columns:
 - `idx`: row in the h5 file

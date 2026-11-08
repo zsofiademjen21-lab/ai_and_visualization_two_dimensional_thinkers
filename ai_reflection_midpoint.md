@@ -10,10 +10,11 @@ AI-aided pair. Tool: Claude Code. Full record: [ai-interactions/ai-use-log.md](a
   - It measured properties of every input image (size, roundness, colour, …).
   - It ran two image-editing experiments (shrink, blur, recolour, squash, rotate, move, add a neighbour) to test causes rather than just correlations.
   - It ran a cluster analysis of the map.
+  - It checked whether the model's mistakes are really wrong labels, using the Galaxy Zoo volunteers' own votes.
 
 ## Did AI change the breadth or depth of our analysis?
 
-Both. **Breadth:** we tested many more hypotheses than we could have by hand: six image properties, eleven kinds of image edits and a cluster analysis. **Depth:** the AI suggested testing patterns by editing the images. This let us go past "we see a pattern" to "this is the cause". For example, it showed that colour is *not* the reason for a mistake, even though the data suggested it was.
+Both. **Breadth:** we tested many more hypotheses than we could have by hand: six image properties, ten kinds of image edits, a cluster analysis and a comparison with the volunteers' votes. **Depth:** the AI suggested testing patterns by editing the images. This let us go past "we see a pattern" to "this is the cause". For example, it showed that colour is *not* the reason for a mistake, even though the data suggested it was.
 
 ## Did it make us faster, or did checking it cost extra work?
 
