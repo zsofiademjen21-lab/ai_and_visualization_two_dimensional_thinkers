@@ -24,7 +24,7 @@ from sklearn.cluster import HDBSCAN
 from sklearn.neighbors import NearestNeighbors
 
 sys.path.insert(0, str(Path(__file__).parent))
-from model import ROOT, CLASS_NAMES  # noqa: E402
+from ai_aided.claude.figures.src.model import ROOT, CLASS_NAMES  # noqa: E402
 
 
 def main():

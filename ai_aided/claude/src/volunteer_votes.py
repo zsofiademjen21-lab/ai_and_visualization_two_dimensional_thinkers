@@ -35,7 +35,7 @@ import pandas as pd
 from sklearn.neighbors import BallTree
 
 sys.path.insert(0, str(Path(__file__).parent))
-from model import ROOT, REPO, CLASS_NAMES  # noqa: E402
+from ai_aided.claude.figures.src.model import ROOT, REPO, CLASS_NAMES  # noqa: E402
 
 CATS = [("dr5", "gz_decals_volunteers_5.csv", True), ("dr12", "gz_decals_volunteers_1_and_2.csv", False)]
 MAX_SEP_ARCSEC = 1.0
