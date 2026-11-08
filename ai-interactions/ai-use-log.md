@@ -33,10 +33,9 @@ Then it asked me to upload a screenshot of the AstroVision results for one or tw
 **my decision:** I agreed:t he merger galaxies were those that were definitely labled correctly, coming from an official source. I shared the results:
 
 **Prompt:**
-
 | Image | True Label | Prediction | Confidence | Merger Probability |
 |:------|:-----------|:-----------|-----------:|-------------------:|
-| <img src="../ai_aided/chatgpt/figures/merger%20galaxies/m001_heic1811a.jpg" width="100">  | Merger | Irregular galaxy | 97,40% | 0,04% |
+| <img src="../ai_aided/chatgpt/figures/merger%20galaxies/m001_heic1811a.jpg" width="100"><br>m001_heic1811a.jpg | Merger | Irregular galaxy | 97,40% | 0,04% |
 	
 I uploaded the image. Also, I told ChatGPT to treat the model as a black box.
 	
@@ -48,12 +47,12 @@ It generated 6 images from the original image: center crop, grayscale, reduced r
 **my decision:** I agreed and uploaded the results:
 | Image | Predicted Class | Confidence | Merger Probability |
 |:------|:----------------|-----------:|-------------------:|
-| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/00_original.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/00_original.jpg) | Irregular galaxy | 97,40% | 0,04% |
-| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/01_center_crop_72pct.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/01_center_crop_72pct.jpg) | Spiral galaxy | 50,99% | 3,95% |
-| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/02_grayscale.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/02_grayscale.jpg) | Irregular galaxy | 97,06% | 0,06% |
-| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/03_downsampled_upscaled.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/03_downsampled_upscaled.jpg) | Irregular galaxy | 97,29% | 0,04% |
-| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/04_lower_contrast.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/04_lower_contrast.jpg) | Irregular galaxy | 98,10% | 0,05% |
-| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/05_mild_blur.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/05_mild_blur.jpg) | Irregular galaxy | 97,27% | 0,04% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/00_original.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/00_original.jpg)<br><sub>00_original.jpg</sub> | Irregular galaxy | 97,40% | 0,04% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/01_center_crop_72pct.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/01_center_crop_72pct.jpg)<br><sub>01_center_crop_72pct.jpg</sub> | Spiral galaxy | 50,99% | 3,95% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/02_grayscale.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/02_grayscale.jpg)<br><sub>02_grayscale.jpg</sub> | Irregular galaxy | 97,06% | 0,06% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/03_downsampled_upscaled.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/03_downsampled_upscaled.jpg)<br><sub>03_downsampled_upscaled.jpg</sub> | Irregular galaxy | 97,29% | 0,04% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/04_lower_contrast.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/04_lower_contrast.jpg)<br><sub>04_lower_contrast.jpg</sub> | Irregular galaxy | 98,10% | 0,05% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/05_mild_blur.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/05_mild_blur.jpg)<br><sub>05_mild_blur.jpg</sub> | Irregular galaxy | 97,27% | 0,04% |
 	
 **ChatGPT:** Observations:
 
@@ -67,14 +66,14 @@ It suggested generating the next set of images directly from the original file, 
 **my decision:** I agreed, let ChatGPT create the images and uploaded the results from the model:
 | Image | Predicted Class | Confidence | Merger Probability |
 |:------|:----------------|-----------:|-------------------:|
-| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_55pct_resized_to_full.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_55pct_resized_to_full.jpg) | Spiral galaxy | 88,01% | 8,68% |
-| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_original_scale_black_canvas.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_original_scale_black_canvas.jpg) | Irregular galaxy | 80,03% | 0,31% |
-| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_original_scale_gray_canvas.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_original_scale_gray_canvas.jpg) | Spiral galaxy | 64,72% | 0,93% |
-| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_resized_to_full.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_resized_to_full.jpg) | Spiral galaxy | 55,52% | 4,00% |
-| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_85pct_resized_to_full.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_85pct_resized_to_full.jpg) | Irregular galaxy | 85,24% | 0,57% |
-| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/original_reference.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/original_reference.jpg) | Irregular galaxy | 97,40% | 0,04% |
-| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/original_zoom_1.39x_centered.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/original_zoom_1.39x_centered.jpg) | Spiral galaxy | 56,48% | 3,88% |
-	
+| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_55pct_resized_to_full.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_55pct_resized_to_full.jpg)<br><sub>crop_55pct_resized_to_full.jpg</sub> | Spiral galaxy | 88,01% | 8,68% |
+| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_original_scale_black_canvas.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_original_scale_black_canvas.jpg)<br><sub>crop_72pct_original_scale_black_canvas.jpg</sub> | Irregular galaxy | 80,03% | 0,31% |
+| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_original_scale_gray_canvas.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_original_scale_gray_canvas.jpg)<br><sub>crop_72pct_original_scale_gray_canvas.jpg</sub> | Spiral galaxy | 64,72% | 0,93% |
+| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_resized_to_full.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_72pct_resized_to_full.jpg)<br><sub>crop_72pct_resized_to_full.jpg</sub> | Spiral galaxy | 55,52% | 4,00% |
+| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/crop_85pct_resized_to_full.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/crop_85pct_resized_to_full.jpg)<br><sub>crop_85pct_resized_to_full.jpg</sub> | Irregular galaxy | 85,24% | 0,57% |
+| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/original_reference.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/original_reference.jpg)<br><sub>original_reference.jpg</sub> | Irregular galaxy | 97,40% | 0,04% |
+| [<img src="../ai_aided/chatgpt/figures/crop-scale%20tests/original_zoom_1.39x_centered.jpg" width="100">](../ai_aided/chatgpt/figures/crop-scale%20tests/original_zoom_1.39x_centered.jpg)<br><sub>original_zoom_1.39x_centered.jpg</sub> | Spiral galaxy | 56,48% | 3,88% |
+
 **ChatGPT:** 
 Observations:
 AstroVision's classification of the investigated galaxy is highly sensitive to image framing and apparent scale. 
@@ -91,13 +90,13 @@ It suggested going deeper into the question by
 **my decision:** I agreed. I was curious. It generated the images, I uploaded the results:
 | Image | Predicted Class | Confidence | Merger Probability |
 |:------|:----------------|-----------:|-------------------:|
-| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/reference_original.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/reference_original.jpg) | Irregular galaxy | 97,40% | 0,04% |
-| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_00_black.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_00_black.jpg) | Irregular galaxy | 80,03% | 0,31% |
-| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_01_dark_gray_16.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_01_dark_gray_16.jpg) | Irregular galaxy | 79,68% | 0,26% |
-| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_02_gray_32.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_02_gray_32.jpg) | Spiral galaxy | 64,72% | 0,93% |
-| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_03_gray_48.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_03_gray_48.jpg) | Spiral galaxy | 80,10% | 1,80% |
-| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_04_gray_64.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_04_gray_64.jpg) | Spiral galaxy | 82,93% | 1,85% |
-| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_05_mid_gray_96.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_05_mid_gray_96.jpg) | Spiral galaxy | 84,39% | 1,61% |
+| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/reference_original.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/reference_original.jpg)<br><sub>reference_original.jpg</sub> | Irregular galaxy | 97,40% | 0,04% |
+| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_00_black.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_00_black.jpg)<br><sub>background_00_black.jpg</sub> | Irregular galaxy | 80,03% | 0,31% |
+| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_01_dark_gray_16.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_01_dark_gray_16.jpg)<br><sub>background_01_dark_gray_16.jpg</sub> | Irregular galaxy | 79,68% | 0,26% |
+| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_02_gray_32.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_02_gray_32.jpg)<br><sub>background_02_gray_32.jpg</sub> | Spiral galaxy | 64,72% | 0,93% |
+| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_03_gray_48.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_03_gray_48.jpg)<br><sub>background_03_gray_48.jpg</sub> | Spiral galaxy | 80,10% | 1,80% |
+| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_04_gray_64.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_04_gray_64.jpg)<br><sub>background_04_gray_64.jpg</sub> | Spiral galaxy | 82,93% | 1,85% |
+| [<img src="../ai_aided/chatgpt/figures/background-sensitivity/background_05_mid_gray_96.jpg" width="100">](../ai_aided/chatgpt/figures/background-sensitivity/background_05_mid_gray_96.jpg)<br><sub>background_05_mid_gray_96.jpg</sub> | Spiral galaxy | 84,39% | 1,61% |
 	
 **ChatGPT:** 
 Observations:
@@ -112,20 +111,20 @@ Background	Changing the background alone changes the predicted class
 It wanted to dive deeper into the background.
 	
 **my decision:** let's change to the next experiment: apparent scale. ChatGPT cerated the images, I uploaded the results:
-| Image               | Predicted Class  | Confidence | Merger Probability |
-|:--------------------|:-----------------|-----------:|-------------------:|
-| original_reference  | Irregular galaxy |     97,40% |              0,04% |
-| apparent_scale_0.60x | Irregular galaxy |     97,61% |              0,04% |
-| apparent_scale_0.75x | Irregular galaxy |     89,92% |              0,27% |
-| apparent_scale_0.90x | Irregular galaxy |     53,34% |              1,38% |
-| apparent_scale_1.00x | Spiral galaxy    |     55,52% |              4,00% |
-| apparent_scale_1.15x | Spiral galaxy    |     79,12% |              9,26% |
-| apparent_scale_1.30x | Spiral galaxy    |     86,80% |              9,45% |
-| apparent_scale_1.45x | Spiral galaxy    |     80,32% |             17,82% |
+| Image | Predicted Class | Confidence | Merger Probability |
+|:------|:----------------|-----------:|-------------------:|
+| [<img src="../ai_aided/chatgpt/figures/apparent-scale/original_reference.jpg" width="100">](../ai_aided/chatgpt/figures/apparent-scale/original_reference.jpg)<br><sub>original_reference.jpg</sub> | Irregular galaxy | 97,40% | 0,04% |
+| [<img src="../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_0.60x.jpg" width="100">](../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_0.60x.jpg)<br><sub>apparent_scale_0.60x.jpg</sub> | Irregular galaxy | 97,61% | 0,04% |
+| [<img src="../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_0.75x.jpg" width="100">](../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_0.75x.jpg)<br><sub>apparent_scale_0.75x.jpg</sub> | Irregular galaxy | 89,92% | 0,27% |
+| [<img src="../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_0.90x.jpg" width="100">](../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_0.90x.jpg)<br><sub>apparent_scale_0.90x.jpg</sub> | Irregular galaxy | 53,34% | 1,38% |
+| [<img src="../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_1.00x.jpg" width="100">](../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_1.00x.jpg)<br><sub>apparent_scale_1.00x.jpg</sub> | Spiral galaxy | 55,52% | 4,00% |
+| [<img src="../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_1.15x.jpg" width="100">](../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_1.15x.jpg)<br><sub>apparent_scale_1.15x.jpg</sub> | Spiral galaxy | 79,12% | 9,26% |
+| [<img src="../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_1.30x.jpg" width="100">](../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_1.30x.jpg)<br><sub>apparent_scale_1.30x.jpg</sub> | Spiral galaxy | 86,80% | 9,45% |
+| [<img src="../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_1.45x.jpg" width="100">](../ai_aided/chatgpt/figures/apparent-scale/apparent_scale_1.45x.jpg)<br><sub>apparent_scale_1.45x.jpg</sub> | Spiral galaxy | 80,32% | 17,82% |
 	
 **ChatGPT:** 
 Observations:
-Experiment B shows a strong, systematic dependence on apparent scale�much stronger than the effects you observed from grayscale, mild blur, or contrast changes.
+Experiment B shows a strong, systematic dependence on apparent scale - much stronger than the effects you observed from grayscale, mild blur, or contrast changes.
 The classifier is not simply responding to the galaxy's overall identity. Its prediction is strongly affected by how much of the image the galaxy occupies.
 
 It wanted to dive deeper into this question.
