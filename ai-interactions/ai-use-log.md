@@ -232,7 +232,7 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 - Made a 12-slide deck for the group meeting, including a slide of questions for the human-only pair.
 - Built `ai_aided/vis/label_check.html`. It shows the 40 most confident mistakes one by one with large images, and has buttons for "label wrong / model wrong / unsure" and a CSV download. It deliberately doesn't show Claude's own earlier impression, so it doesn't bias our judgement.
 
-**My decision:** Accepted. The label check means the "wrong labels" idea will be decided by us, not by the AI.
+**My decision:** Accepted the tool, but in the end I didn't use it to decide the labels myself (see 14).
 
 ---
 
@@ -252,7 +252,7 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 
 **What went wrong:** Claude's earlier visual impression, "about 16 of the 40 most confident mistakes look mislabelled", was too strong. Of the 15 of those 40 that have votes, only 3 have votes backing the model. Claude was right that those galaxies look like spirals, but wrong that the label was therefore wrong. Claude corrected the findings page, report, reflection and slides.
 
-**My decision:** Accepted. Wrong labels are now a minor explanation (about 1 in 10 mistakes), and "disturbed spirals" is the better explanation.
+**My decision:** I decided not to judge the 40 galaxies by hand. As a non-expert I couldn't tell reliably whether a label was wrong, so my judgement would have been weak evidence. The volunteers' votes are a more objective source, because they come from the people who made the labels in the first place. I accepted the result: wrong labels are only a minor explanation (about 1 in 10 mistakes), and "disturbed spirals" is the better one. The label-check page stays available, for example for the comparison with the human-only pair.
 
 ---
 
@@ -271,6 +271,7 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 | Testing ideas by editing the images | Accepted | It separates causes from coincidences, and the assignment allows a synthetic dataset. |
 | "Many confident mistakes are wrong labels" (Claude looking at the images) | Rejected after checking | The volunteers' own votes back the model in only 10% of mistakes. Most were disturbed spirals, where both answers fit. |
 | Cluster analysis of the map | Accepted | It shows where the mistakes are and why. |
+| Judging the 40 most confident mistakes by hand (label-check page) | Not used | As a non-expert my judgement would have been weak evidence. We used the volunteers' own votes instead. |
 
 ## How the AI changed the direction of our analysis
 
@@ -283,21 +284,54 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 
 ## Failure patterns we saw
 
-- Generated code can contain small bugs even when it looks fine.
-- Numbers can look reasonable but come from a wrong calculation (the measurement bug).
-- The AI fills gaps in the task with "standard practice", even when that breaks the task rules (Phase II drift).
-- AI-written summaries can choose comparisons that make results look stronger than they are.
-- Edited test images can contain artefacts (boxes, hard edges) that the model may react to instead of the real change.
-- The AI's visual judgement of images is not reliable on its own: it thought about 16 of 40 confident mistakes were mislabelled, but the volunteers' votes backed that for only 3 of the 15 galaxies that have votes.
-- The AI's first default settings can give useless results (the first clustering found only 2 clusters).
+The section numbers point to the log entries above.
+
+**Code and numbers**
+- Generated code can contain small bugs even when it looks fine (§2).
+- Numbers can look reasonable but come from a wrong calculation. The first roundness values made edge-on disks almost as round as ellipticals (§4).
+- The AI's first default settings can give useless results. The first clustering found only 2 clusters (§11).
+
+**Following the task**
+- The AI fills gaps in the task with "standard practice", even when that breaks the task rules. It used the model's internal features, which belongs to Phase II (§3).
+
+**Claims and writing**
+- AI-written text can contain small factual slips ("third-rarest" instead of second-rarest) and can choose comparisons that make results look stronger than they are (§5).
+- A pattern in real data can look like a cause when it isn't. Red disturbed galaxies were called Elliptical more often, but changing only the colour changed nothing (§7).
+- Results from different kinds of evidence can get mixed up. A result from the real images was shown in the "tested by editing images" card (§10).
+- Page text can contain hard-coded values that no longer match the data, such as region numbers written by hand (§11).
+- The first version of the output is often correct but too detailed and full of jargon for the audience (§6, §12).
+
+**Experiments and images**
+- Edited test images can contain artefacts (flat grey padding, square boxes, hard circle edges) that the model may react to instead of the real change (§7, §9).
+- Charts can have layout problems that only show when they are rendered: a cut-off axis label, a circle drawn far too big (§11, §12).
+- A default view can hide the pattern. With "all classes" selected, every bar looked the same (§12).
+
+**Judgement**
+- The AI's visual judgement of images is not reliable on its own. It thought about 16 of 40 confident mistakes were mislabelled, but the volunteers' votes backed that for only 3 of the 15 that have votes (§14).
+- Once an idea is raised, later results get read as support for it. The "wrong labels" idea was linked to the training-set gap (§9) and the map regions (§11) and spread to the findings page, report, reflection and slides before it was checked. It then had to be corrected everywhere (§14).
 
 ## Best practices
 
-- Let the AI read the real source (code, documentation) instead of answering from memory.
-- Give it the exact task rules at the beginning.
-- Check every number against something you already know is true.
-- Look at the rendered charts, not just the code.
-- Re-read every claim the AI writes against the actual numbers in the chart.
-- Don't trust a pattern in the data alone. Test it by changing the input (the colour pattern turned out to be false).
-- Look at the edited test images before running the test.
-- Check the AI's judgements against independent data where it exists (here, the volunteers' votes).
+**Before starting**
+- Let the AI read the real source (code, documentation) instead of answering from memory (§1).
+- Give it the exact task rules at the beginning (§3).
+- Say who the output is for (for example "readers without a machine-learning background") so the first version doesn't need rewriting (§6, §12).
+
+**Checking the work**
+- Check every number against something you already know is true: the reported 92.9% accuracy, known differences between classes (§4).
+- Re-read every claim the AI writes against the actual numbers in the chart (§5).
+- Look at the rendered charts and screenshots, not just the code. Asking the AI to check its own screenshots caught many of its mistakes (§11, §12).
+- Calculate the numbers in the text from the data instead of typing them in (§5, §11).
+- Don't accept the first default settings. Check whether the result is useful and try other settings (§11).
+
+**Testing ideas**
+- Don't trust a pattern in the data alone. Test it by changing the input (the colour pattern turned out to be false, §7).
+- Look at the edited test images before running the test (§7, §9).
+- Accept results that weaken an earlier idea, not only ones that confirm it (the squash test, §9).
+- Drop findings with too little data rather than presenting them (Cigar-shaped Ellipticals, about 18 galaxies per group, §6).
+- Label where each result comes from: real data or edited images (§10).
+
+**Judgements**
+- Mark the AI's impressions as "still to check" and keep them out of the report until they are checked (§8, §14).
+- Check the AI's judgements against independent data where it exists (here, the volunteers' votes, §14).
+- When we judge something ourselves, hide the AI's opinion first so it doesn't bias us (the label-check page, §13).

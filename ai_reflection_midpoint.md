@@ -1,6 +1,13 @@
-# AI Reflection: Midpoint (end of Phase I)
+Phase I.
 
-AI-aided pair. Tool: Claude Code. Full record: [ai-interactions/ai-use-log.md](ai-interactions/ai-use-log.md).
+# AI Reflection: Midpoint
+
+AI-aided pair: 
+Zsófia Demjén-Nagy k12413807
+Livia Koch  k09956227
+
+
+Tool: Claude Code. Full record: [ai-interactions/ai-use-log.md](ai-interactions/ai-use-log.md).
 
 ## What the AI did for us
 
