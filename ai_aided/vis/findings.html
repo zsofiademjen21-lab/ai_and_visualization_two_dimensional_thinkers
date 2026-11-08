@@ -310,7 +310,7 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
     ["Shape", "Round ellipticals squashed flat · called Edge-on", share(round, t => t.original === 2), share(round, t => t.squash === 2)],
     ["Neighbours", "Small galaxy added next to spirals · called Merger", share(sp, t => t.original === 4), share(sp, t => t.add_neighbour === 4)],
     ["Surroundings", "Surroundings removed around mergers · still Merger", share(mer, t => t.original === 4), share(mer, t => t.no_context === 4)],
-    ["Distance", "Nearest fifth vs farthest fifth of real galaxies (not edited) · correct", share(z.slice(0, f5), ok), share(z.slice(-f5), ok)],
+    ["Distance", "Closest vs farthest galaxies (real images) · correct", share(z.slice(0, f5), ok), share(z.slice(-f5), ok)],
   ];
   $("t6").innerHTML = `<div class="head">What we changed</div><div class="head">before</div><div class="head"></div><div class="head">after</div>` +
     rows.map(([k, s, a, b]) => `<div class="what"><b>${k}</b><span>${s}</span></div><div class="v">${pct(a)}</div><div class="arr">→</div><div class="v">${pct(b)}</div>`).join("");
