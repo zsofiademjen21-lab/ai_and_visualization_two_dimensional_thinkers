@@ -6,7 +6,7 @@ Spiral, Elliptical, Edge-on Disk, Irregular, Merger.
 
 This folder holds the AI-aided pair's Phase I work. The AI-use log is in [`../ai-interactions/ai-use-log.md`](../ai-interactions/ai-use-log.md).
 
-**To see the results:** open [`vis/findings.html`](vis/findings.html) (key takeaways) or [`vis/explorer.html`](vis/explorer.html) (interactive explorer) in a browser.
+**To see the results:** open [`vis/findings.html`](vis/findings.html) (key takeaways) or [`vis/explorer.html`](vis/explorer.html) (interactive explorer) in a browser. The written Phase I section is [`report_phase1.md`](report_phase1.md), with its charts in `figures/`. [`vis/label_check.html`](vis/label_check.html) is a tool for checking the labels of the 40 most confident mistakes by hand.
 
 ## Setup
 
@@ -29,11 +29,11 @@ Run these from this folder (`ai_aided/`):
 
 | Step | Command | Output |
 |---|---|---|
-| 1. Inference on all 17,736 images (about 40 min on CPU) | `python src/run_inference.py` | `results/predictions.csv`, `results/features.npy` |
+| 1. Inference on all 17,736 images (about 40 min on CPU) | `python src/run_inference.py` | `results/predictions.csv` |
 | 2. Measure input-image properties (a few min) | `python src/input_properties.py` | `results/input_props.csv` |
 | 3. Build the explorer data | `python src/build_explorer.py` | `vis/explorer_data.js`, `vis/thumbs.js` |
 | 4. Image-editing tests (about 10 + 15 min) | `python src/perturbation_test.py`, `python src/perturbation_test2.py` | `results/perturbations.csv`, `results/perturbations2.csv` |
-| 5. Build the findings data | `python src/build_findings_data.py` | `vis/perturbation_data.js` |
+| 5. Build the findings data | `python src/build_findings_data.py`, `python src/build_map_data.py` | `vis/perturbation_data.js`, `vis/map_data.js` |
 
 `predictions.csv` has one row per image with these columns:
 - `idx`: row in the h5 file
@@ -55,13 +55,19 @@ Run these from this folder (`ai_aided/`):
 
 ```
 src/model.py               model loader, class names, label mapping, preprocessing
-src/run_inference.py       predictions + embeddings for every image
+src/run_inference.py       model outputs (predictions, probabilities) for every image
 src/input_properties.py    size, roundness, colour, ... measured on each input image
 src/build_explorer.py      data for the interactive explorer
 src/perturbation_test.py   image-editing test 1: recolour / shrink / rotate
 src/perturbation_test2.py  image-editing test 2: blur / squash / shift / surroundings / neighbour
-src/build_findings_data.py data for the findings page
+src/build_findings_data.py data for the findings page (image-editing tests)
+src/build_map_data.py      regions on the output map (clusters, crowdedness) for the findings page
+src/build_label_check.py   data for the label-check tool (40 most confident mistakes)
+src/volunteer_votes.py     Galaxy Zoo volunteer votes matched to our galaxies (needs data/gz_decals/, see the script)
 results/                   model outputs and test results (CSV)
 vis/findings.html          Phase I key takeaways
 vis/explorer.html          Phase I interactive explorer (linked views)
+vis/label_check.html       hand check of the 40 most confident mistakes
+figures/                   one picture per takeaway, for the report
+report_phase1.md           Phase I report section
 ```

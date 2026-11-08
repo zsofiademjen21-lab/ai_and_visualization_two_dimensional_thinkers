@@ -96,7 +96,21 @@ Both were corrected.
 
 ---
 
-## 6. Further findings
+## 6. Making the visualisation simpler
+
+**Prompt:** "Make the visualisations simpler and easier to understand. Only show the key takeaways."
+
+**What Claude did:** It rewrote the findings page:
+- Each finding now has one plain-language headline, one or two sentences, one simple chart with only two or three bars, and a few example galaxies.
+- Technical words like "recall" and "quintile" were removed.
+- It dropped the Cigar-shaped Elliptical finding, because the evidence was weak (only about 18 galaxies per group).
+- The detailed interactive explorer was kept separately for anyone who wants to dig deeper.
+
+**My decision:** Modified. Claude's first version was correct but too detailed and technical to present. I asked for it to be simplified, and I agreed with dropping the weak finding.
+
+---
+
+## 7. Further findings
 
 **Prompt:** "Can you find further findings?"
 
@@ -117,7 +131,7 @@ Both were corrected.
 
 ---
 
-## 7. Adding the new findings to the visualisation
+## 8. Adding the new findings to the visualisation
 
 **Prompt:** "Add them to the visualisations"
 
@@ -127,7 +141,7 @@ Both were corrected.
 
 ---
 
-## 8. Searching for more findings
+## 9. Searching for more findings
 
 **Prompt:** "could you search for more findings?"
 
@@ -150,7 +164,7 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 
 ---
 
-## 9. Adding the second test to the visualisation
+## 10. Adding the second test to the visualisation
 
 **Prompt:** "add this too to the visualisation"
 
@@ -168,6 +182,105 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 
 ---
 
+## 11. Analysing the map of the model's answers
+
+**Prompt:** Analyse the clusters on the map of the model's answers
+
+**What Claude did:** The explorer already had a 2D map of the model's answers, but its clusters had not been analysed yet. Claude:
+- found the regions on the map automatically (HDBSCAN, `ai_aided/src/build_map_data.py`);
+- compared the regions by error rate, true labels, confidence and image properties;
+- checked whether mistakes happen more in sparse or crowded parts of the map;
+- looked inside the error regions for sub-groups.
+
+**Results:**
+1. Most of the map is dense islands where the model is sure and never wrong (25 regions with 0 mistakes).
+2. Mistakes sit in two kinds of places: on "bridges" between two classes, where the model is torn between exactly two answers, and in groups hidden inside the Spiral island, where the model is sure but about a quarter of the galaxies are labelled disturbed.
+3. When the model is unsure, 82% of the time almost all its doubt is between exactly two classes. Spiral is part of most of these pairs.
+4. On the Spiral ↔ Edge-on bridge, true spirals and true edge-on disks are equally flat (tilted disks), and mistakes go both ways equally.
+5. The disturbed galaxies hidden among spirals look like the spirals around them in colour, size and shape. This again points to unclear labels.
+6. Sparse vs crowded parts of the map have the same error rate (9% vs 9%), so density doesn't explain the mistakes. About half the mistakes are unsure ones on bridges, half are confident ones inside islands.
+
+**What went wrong:** The first clustering (default settings) found only 2 big clusters, which was useless, so Claude switched to a finer setting. In the first version of the page, the text named the regions by hard-coded numbers, and one circle was drawn far too big. Both were fixed.
+
+**My decision:** Accepted. The map now shows where the mistakes are and explains why they happen there.
+
+---
+
+## 12. Making the explorer easier to understand
+
+**Prompt:** "make the visualisations more understandable if it is possible"
+
+**What Claude did:** It rewrote the wording of the interactive explorer (`ai_aided/vis/explorer.html`) for readers without a machine-learning background:
+- a 3-step "how to use" guide at the top, and a link to the key takeaways;
+- plain names instead of jargon, for example "Confusion matrix" became "What the model answers for each true class", "Recall" became "How often each class is recognised", and "Calibration" became "Is the model as sure as it should be?";
+- one "Look for: ..." hint under each chart that says what to pay attention to;
+- the "What does the answer depend on?" chart now opens on Irregular galaxies, where a real pattern is visible straight away. With "all classes" every bar looked the same.
+
+**What went wrong:** One axis label was cut off and some labels still used jargon ("misclassified", "n="). Claude found these in the screenshots and fixed them.
+
+**My decision:** Accepted. The charts themselves stayed the same; only the explanations changed.
+
+---
+
+## 13. Report, slides and a label-check tool
+
+**Prompts:** "Write the Phase I section of our report from the findings page and the log.", "Make a short slide deck of the 7 takeaways for the group meeting.", "Export each takeaway chart as a picture for the report." and "Show me the 40 most confident mistakes one by one so I can decide myself whether the label is wrong."
+
+**What Claude did:**
+- Exported each takeaway as a picture (`ai_aided/figures/`).
+- Wrote the report section (`ai_aided/report_phase1.md`), checking its numbers against the charts.
+- Made a 12-slide deck for the group meeting, including a slide of questions for the human-only pair.
+- Built `ai_aided/vis/label_check.html`. It shows the 40 most confident mistakes one by one with large images, and has buttons for "label wrong / model wrong / unsure" and a CSV download. It deliberately doesn't show Claude's own earlier impression, so it doesn't bias our judgement.
+
+**My decision:** Accepted. The label check means the "wrong labels" idea will be decided by us, not by the AI.
+
+---
+
+## 14. Checking the labels with the volunteers' own votes
+
+**Prompts:** "what if I can't know enough to decide?" and then "Use the volunteers' own votes, the most objective option."
+
+**What Claude did:**
+- Suggested several options for when I can't judge a galaxy myself: "unsure" as valid data, letting all four of us judge and comparing, a deeper sky image, or the volunteers' own votes.
+- Downloaded the public Galaxy Zoo DECaLS vote catalogue (Walmsley et al. 2022) and matched it to our galaxies by sky position (`ai_aided/src/volunteer_votes.py`). Only 45% of Galaxy10 galaxies have public votes.
+- Turned the votes into a "support" score for each of our five classes and compared the support for the label with the support for the model's answer.
+- Added the votes to the label-check page, revealed only after I decide, with a count of how often I agree with the volunteers.
+
+**Results (202 mistakes with votes):**
+- The votes back the label (the model is wrong) in 54% of mistakes. The volunteers were split in 18%, both answers fit in 17%, and the votes back the model (the label is wrong) in only 10%.
+- No disturbed-galaxy mistake had votes backing the model. When the model calls a disturbed galaxy a spiral, most volunteers had seen both the disturbance (68%) and spiral arms (51%). These are disturbed spirals: the five classes force one answer for a galaxy that is both.
+
+**What went wrong:** Claude's earlier visual impression, "about 16 of the 40 most confident mistakes look mislabelled", was too strong. Of the 15 of those 40 that have votes, only 3 have votes backing the model. Claude was right that those galaxies look like spirals, but wrong that the label was therefore wrong. Claude corrected the findings page, report, reflection and slides.
+
+**My decision:** Accepted. Wrong labels are now a minor explanation (about 1 in 10 mistakes), and "disturbed spirals" is the better explanation.
+
+---
+
+## Which AI suggestions we accepted, changed or rejected
+
+| AI suggestion | Decision | Why |
+|---|---|---|
+| Load the model with plain `timm` instead of the `zoobot` package | Accepted | We checked it: our accuracy matched the author's 92.9% exactly. |
+| Map of the galaxies built from the model's internal features | Rejected, replaced | Phase I must be black-box, so the map now uses only the model's answers. |
+| t-SNE for the map instead of UMAP | Accepted | UMAP wasn't installed, and t-SNE is a standard choice. |
+| Measuring size, roundness, colour etc. on each image | Accepted after a fix | The first measurements had a bug that a sanity check caught. |
+| First findings page with detailed charts | Modified | Too technical. We asked for a simpler page with key takeaways only. |
+| Cigar-shaped Elliptical finding | Dropped from the takeaways | Weak evidence (about 18 galaxies per group), and the squash test weakened it further. It is still visible in the explorer. |
+| "The model uses colour" (pattern in the data) | Rejected after testing | Changing only the colour of the images didn't change the answers. |
+| "Small galaxies get called Elliptical" | Refined | The blur test showed the real cause is loss of detail, not size itself. |
+| Testing ideas by editing the images | Accepted | It separates causes from coincidences, and the assignment allows a synthetic dataset. |
+| "Many confident mistakes are wrong labels" (Claude looking at the images) | Rejected after checking | The volunteers' own votes back the model in only 10% of mistakes. Most were disturbed spirals, where both answers fit. |
+| Cluster analysis of the map | Accepted | It shows where the mistakes are and why. |
+
+## How the AI changed the direction of our analysis
+
+1. **From the model's code to our first hypothesis.** Claude read the author's code and pointed out that the classes are imbalanced and no class weights were used. That made us look at the rare classes first, which led to takeaway 1 (disturbed galaxies are the blind spot).
+2. **From a pattern to a test.** Claude measured properties of the images and found that small and red disturbed galaxies are often called Elliptical. Because size, colour and distance are mixed together in real images, it suggested editing the images to find the real cause. The test showed colour doesn't matter (rejected) and the loss of detail does (refined). We restructured our takeaways around this.
+3. **One idea connecting several findings.** Claude's look at the most confident mistakes raised the idea that some labels may be wrong. This was later supported in two other places: the model gets 26% of disturbed galaxies wrong even on its own training images, and disturbed galaxies hidden among spirals on the map look exactly like spirals. It became a thread through several takeaways. When we checked it with the volunteers' own votes, it turned out mostly wrong: the votes back the model in only 10% of mistakes. The better explanation is that many disturbed galaxies are also spirals, so two answers fit.
+4. **A correction that made later work possible.** Moving the map from internal features to the model's answers (to stay black-box) later allowed the cluster analysis of the map.
+
+---
+
 ## Failure patterns we saw
 
 - Generated code can contain small bugs even when it looks fine.
@@ -175,6 +288,8 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 - The AI fills gaps in the task with "standard practice", even when that breaks the task rules (Phase II drift).
 - AI-written summaries can choose comparisons that make results look stronger than they are.
 - Edited test images can contain artefacts (boxes, hard edges) that the model may react to instead of the real change.
+- The AI's visual judgement of images is not reliable on its own: it thought about 16 of 40 confident mistakes were mislabelled, but the volunteers' votes backed that for only 3 of the 15 galaxies that have votes.
+- The AI's first default settings can give useless results (the first clustering found only 2 clusters).
 
 ## Best practices
 
@@ -185,3 +300,4 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 - Re-read every claim the AI writes against the actual numbers in the chart.
 - Don't trust a pattern in the data alone. Test it by changing the input (the colour pattern turned out to be false).
 - Look at the edited test images before running the test.
+- Check the AI's judgements against independent data where it exists (here, the volunteers' votes).

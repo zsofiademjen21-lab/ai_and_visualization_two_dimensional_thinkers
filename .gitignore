@@ -222,4 +222,3 @@ __marimo__/
 # Project data / weights (re-downloadable)
 data/
 models/
-ai_aided/results/features.npy

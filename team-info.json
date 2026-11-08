@@ -12,22 +12,22 @@
             "student_id": "k09956227",
             "first_name": "Livia",
             "last_name": "Koch",
-            "email": "first.last@mail.com",
-            "github_user": "mygitusername"
+            "email": "livia.koch@gmx.at",
+            "github_user": "livko-xy"
         },
         {
             "student_id": "k12141900",
             "first_name": "Daniel",
             "last_name": "Morgunov",
-            "email": "first.last@mail.com",
-            "github_user": "mygitusername"
+            "email": "",
+            "github_user": ""
         },
         {
             "student_id": "K12245534",
             "first_name": "Bence",
             "last_name": "Kovács",
-            "email": "first.last@mail.com",
-            "github_user": "mygitusername"
+            "email": "",
+            "github_user": ""
         }
         
     ]

@@ -61,13 +61,20 @@ svg text { fill: var(--ink-2); font-size: 14px; }
 .nope .arr { color: var(--muted); }
 .nope .head { color: var(--muted); font-size: 12.5px; padding: 0 0 4px; border-bottom: 1px solid var(--grid); text-align: right; }
 .nope .head:first-child { text-align: left; }
+.legend-m { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--ink-2); margin: 8px 0 12px; }
+.legend-m i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.regions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 20px; }
+@media (max-width: 600px) { .regions { grid-template-columns: minmax(0, 1fr); } }
+.regions div { display: grid; grid-template-columns: 26px 1fr; gap: 8px; font-size: 14px; color: var(--ink-2); align-items: start; }
+.regions .badge { width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--surface-1); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+.regions b { color: var(--ink); }
 .note { font-size: 14px; color: var(--ink-2); background: var(--surface-2); border-radius: 8px; padding: 10px 14px; margin-top: 18px; }
 .foot { color: var(--muted); font-size: 13px; margin-top: 28px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>What we found: 6 key takeaways</h1>
+  <h1>What we found: 7 key takeaways</h1>
   <p class="lede" id="lede"></p>
 
   <section class="card">
@@ -113,11 +120,23 @@ svg text { fill: var(--ink-2); font-size: 14px; }
     <div id="t5-chart"></div>
     <p class="ex-t">Examples: the model's most confident mistakes (true label → model's answer)</p>
     <div class="ex" id="t5-ex"></div>
-    <p class="note"><b>Still to check:</b> some of these may be wrong labels, not model mistakes. At a first look, about 16 of the 40 most confident mistakes seem mislabelled, mostly "disturbed" galaxies that look like normal spirals, or "spirals" that are clearly two galaxies merging. We need to check this by hand.</p>
+    <p class="note"><b>Are the labels wrong? Checked with the volunteers' own votes.</b> For the 202 mistakes whose Galaxy Zoo votes are public (about 45% of galaxies), the votes back the label in 54% of cases, the volunteers were split in 18%, both answers fit in 17%, and the votes back the model in only 10%. So wrong labels explain only about 1 in 10 mistakes. When the model calls a disturbed galaxy a spiral, it is usually a <b>disturbed spiral</b>: most volunteers saw both the disturbance and the spiral arms, so the five classes force one answer for a galaxy that is both.</p>
   </section>
 
   <section class="card">
-    <div class="num">Takeaway 6 <span class="tag">tested by editing images</span></div>
+    <div class="num">Takeaway 6</div>
+    <h2>On the map of the model's answers, mistakes sit in two kinds of places</h2>
+    <p class="say" id="m-say"></p>
+    <div id="m-map"></div>
+    <div class="legend-m" id="m-legend"></div>
+    <div class="regions" id="m-regions"></div>
+    <p class="ex-t" style="margin-top:22px">When the model is unsure, which two classes is it choosing between?</p>
+    <div id="m-pairs"></div>
+    <p class="note" id="m-note"></p>
+  </section>
+
+  <section class="card">
+    <div class="num">Takeaway 7 <span class="tag">tested by editing images</span></div>
     <h2>What does <i>not</i> confuse the model</h2>
     <p class="say">Some things looked like they might matter, so we changed them on purpose. The answers barely moved.</p>
     <div class="nope" id="t6"></div>
@@ -130,11 +149,12 @@ svg text { fill: var(--ink-2); font-size: 14px; }
 <script src="explorer_data.js"></script>
 <script src="thumbs.js"></script>
 <script src="perturbation_data.js"></script>
+<script src="map_data.js"></script>
 <script>
 (() => {
 const D = window.EXPLORER_DATA, T = window.EXPLORER_THUMBS || {}, PD = window.PERTURB_DATA;
 const C5 = D.classes;
-const R = D.rows.map(r => ({ idx: r[0], split: r[1], l10: r[2], l5: r[3], pred: r[4], q: r[7] || [], conf: Math.max(...r[5]) }));
+const R = D.rows.map(r => ({ idx: r[0], split: r[1], l10: r[2], l5: r[3], pred: r[4], p: r[5], xy: r[6], q: r[7] || [], conf: Math.max(...r[5]) }));
 const VAL = R.filter(d => d.split === 0), TR = R.filter(d => d.split === 1);
 const BY = new Map(R.map(d => [d.idx, d]));
 const ok = d => d.pred === d.l5, $ = id => document.getElementById(id);
@@ -175,7 +195,7 @@ function bars(id, rows, max = 1) {
   $(id).innerHTML = s + "</svg>";
 }
 
-$("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocaleString()} galaxy images it had not been trained on. Overall it is right ${pct(share(VAL, ok))} of the time, the same as the author reports. But that single number hides six important things about how it behaves.`;
+$("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocaleString()} galaxy images it had not been trained on. Overall it is right ${pct(share(VAL, ok))} of the time, the same as the author reports. But that single number hides seven important things about how it behaves.`;
 
 // ---------- 1: disturbed galaxies ----------
 {
@@ -231,7 +251,7 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
     { label: "All other types · training images", v: acc(TR, common) },
     { label: "All other types · new images", v: acc(VAL, common) },
   ]);
-  $("t4-say").innerHTML = `For most galaxy types, the model does about as well on new images as on the images it was trained on. For the two <b>rarest</b> types it doesn't: disturbed galaxies drop from <b>${pct(acc(TR, d => d.l10 === 0))} to ${pct(acc(VAL, d => d.l10 === 0))}</b>, cigar-shaped ellipticals from ${pct(acc(TR, d => d.l10 === 4))} to ${pct(acc(VAL, d => d.l10 === 4))} (chart: share correct). It remembered the few examples it saw instead of learning what these galaxies look like. And even on its training images it gets ${pct(1 - acc(TR, d => d.l10 === 0))} of disturbed galaxies wrong, another hint that their labels may be inconsistent.`;
+  $("t4-say").innerHTML = `For most galaxy types, the model does about as well on new images as on the images it was trained on. For the two <b>rarest</b> types it doesn't: disturbed galaxies drop from <b>${pct(acc(TR, d => d.l10 === 0))} to ${pct(acc(VAL, d => d.l10 === 0))}</b>, cigar-shaped ellipticals from ${pct(acc(TR, d => d.l10 === 4))} to ${pct(acc(VAL, d => d.l10 === 4))} (chart: share correct). It remembered the few examples it saw instead of learning what these galaxies look like. And even on its training images it gets ${pct(1 - acc(TR, d => d.l10 === 0))} of disturbed galaxies wrong, and the volunteers' votes show why: many of them are spirals that are also disturbed, so two answers fit.`;
 }
 
 // ---------- 5: confident mistakes ----------
@@ -245,7 +265,40 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
   examples("t5-ex", sure.sort((a, b) => b.conf - a.conf).slice(0, 6), d => `${NICE[d.l10]} → ${C5[d.pred]}`);
 }
 
-// ---------- 6: what does not matter ----------
+// ---------- 6: the output map ----------
+{
+  const MD = window.MAP_DATA, REG = new Map(MD.points), regs = new Map(MD.regions.map(r => [r.id, r]));
+  const pts = VAL.filter(d => d.xy);
+  const W = 760, H = 560, pad = 12, X = v => pad + v * (W - 2 * pad), Y = v => pad + (1 - v) * (H - 2 * pad);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of the model's answers">`;
+  pts.filter(ok).forEach(d => s += `<circle cx="${X(d.xy[0]).toFixed(1)}" cy="${Y(d.xy[1]).toFixed(1)}" r="1.8" fill="var(--base)"/>`);
+  pts.filter(d => !ok(d)).forEach(d => s += `<circle cx="${X(d.xy[0]).toFixed(1)}" cy="${Y(d.xy[1]).toFixed(1)}" r="2.6" fill="var(--hi)"/>`);
+  MD.notes.forEach((n, i) => {
+    const r = regs.get(n.id), cx = X(r.x), cy = Y(r.y), rad = Math.min(40, Math.max(16, r.r * (W - 2 * pad) * 1.8));
+    s += `<circle cx="${cx}" cy="${cy}" r="${rad}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-opacity=".7"/>
+      <circle cx="${cx + rad * 0.72}" cy="${cy - rad * 0.72}" r="11" fill="var(--ink)"/>
+      <text x="${cx + rad * 0.72}" y="${cy - rad * 0.72 + 4}" text-anchor="middle" style="fill:var(--surface-1);font-size:12px;font-weight:600">${i + 1}</text>`;
+  });
+  $("m-map").innerHTML = s + "</svg>";
+  $("m-legend").innerHTML = `<span><i style="background:var(--base)"></i>correct</span><span><i style="background:var(--hi)"></i>mistake</span><span>Each dot is one galaxy. Galaxies close together got similar answers from the model.</span>`;
+  const nice = n => n.kind === "bridge" ? "Torn between " + n.label.replace(" ↔ ", " and ").replace("Irregular", "Disturbed")
+    : n.label.replace(" Irregular hidden among Spiral", " are disturbed galaxies hidden among spirals");
+  const nums = kind => MD.notes.map((n, i) => n.kind === kind ? i + 1 : null).filter(Boolean).join(", ");
+  $("m-regions").innerHTML = MD.notes.map((n, i) => { const r = regs.get(n.id);
+    return `<div><span class="badge">${i + 1}</span><span><b>${nice(n)}</b><br>${r.n} galaxies · ${pct(r.err)} wrong · model ${pct(n.conf)} sure on average</span></div>`; }).join("");
+
+  // two-way doubt, computed from the probabilities
+  const unsure = pts.filter(d => d.conf < 0.8), top2 = d => { const s = [...d.p].sort((a, b) => b - a); return s[0] + s[1]; };
+  const pairCount = {};
+  unsure.forEach(d => { const o = d.p.map((v, i) => [v, i]).sort((a, b) => b[0] - a[0]); const k = [o[0][1], o[1][1]].sort().map(i => C5[i]).join(" / "); pairCount[k] = (pairCount[k] || 0) + 1; });
+  const top = Object.entries(pairCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  bars("m-pairs", top.map(([k, n], i) => ({ label: k.replace("Irregular", "Disturbed"), v: n / unsure.length, hi: k.includes("Spiral") })), 0.3);
+  const wrong = pts.filter(d => !ok(d));
+  $("m-say").innerHTML = `This map places every galaxy by the model's answer: galaxies close together got similar answers. Most of the map is made of <b>dense islands where the model is completely sure and almost never wrong</b>. The mistakes (orange) sit in two kinds of places: on <b>bridges between two islands</b>, where the model is torn between two classes (${nums("bridge")}), and in <b>groups hidden inside the Spiral island</b>, where the model is sure but about a quarter of the galaxies are actually disturbed (${nums("hidden")}).`;
+  $("m-note").innerHTML = `<b>What the map tells us.</b> When the model is unsure, it is almost never confused in general: in ${pct(share(unsure, d => top2(d) > 0.9))} of unsure cases, nearly all its doubt is between exactly <b>two</b> classes, and Spiral is part of most of these pairs. The bridges are genuinely in-between galaxies: on the Spiral ↔ Edge-on bridge, true spirals and true edge-on disks are equally flat (they are tilted disks), and the model's mistakes go both ways equally. In the hidden groups, the "disturbed" galaxies look like the real spirals around them in colour, size and shape, and the volunteers' votes show many of them are disturbed spirals, where both answers fit. Being in a sparse or crowded part of the map does <b>not</b> predict mistakes (${pct(MD.density.sparsest)} vs ${pct(MD.density.densest)} wrong): about half the mistakes (${pct(share(wrong, d => d.conf < 0.8))}) are unsure ones on bridges, the other half are confident ones inside islands.`;
+}
+
+// ---------- 7: what does not matter ----------
 {
   const irr = of(T1, 3).filter(t => t.d.q[4] != null);
   const med = irr.map(t => t.d.q[4]).sort((a, b) => a - b)[Math.floor(irr.length / 2)];

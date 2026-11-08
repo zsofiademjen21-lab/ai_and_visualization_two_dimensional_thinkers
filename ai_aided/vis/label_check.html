@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Label Check</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface-1: #fcfcfb; --surface-2: #f0efec;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781; --grid: #e1e0d9; --ring: rgba(11,11,11,0.10);
+  --hi: #eb6834; --s1: #2a78d6; --base: #c3c2b7;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface-1: #1a1a19; --surface-2: #262624;
+    --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --ring: rgba(255,255,255,0.10);
+    --hi: #d95926; --s1: #3987e5; --base: #4a4a46;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface-1: #1a1a19; --surface-2: #262624;
+  --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --ring: rgba(255,255,255,0.10);
+  --hi: #d95926; --s1: #3987e5; --base: #4a4a46;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 28px 16px 48px; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+.lede { color: var(--ink-2); margin: 0 0 16px; }
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-bottom: 14px; }
+.prog { flex: 1; min-width: 200px; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--s1); border-radius: 4px; }
+.count { font-variant-numeric: tabular-nums; color: var(--ink-2); font-size: 14px; }
+.card { background: var(--surface-1); border: 1px solid var(--ring); border-radius: 14px; padding: 20px; }
+.main { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; }
+@media (max-width: 820px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.imgs figure { margin: 0; }
+.imgs img { width: 100%; aspect-ratio: 1; display: block; border-radius: 8px; image-rendering: auto; }
+.imgs figcaption { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+.fact { margin: 0 0 12px; }
+.fact .k { font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.fact .v { font-size: 20px; font-weight: 600; }
+.fact .s { color: var(--ink-2); font-size: 14px; }
+.pbar { display: grid; grid-template-columns: 100px 1fr 52px; gap: 8px; align-items: center; font-size: 13.5px; margin: 4px 0; }
+.pbar .t { height: 10px; background: var(--surface-2); border-radius: 5px; overflow: hidden; }
+.pbar .f { height: 100%; border-radius: 5px; }
+.pbar .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+@media (max-width: 560px) { .choices { grid-template-columns: minmax(0, 1fr); } }
+.choice { font: inherit; text-align: left; border: 2px solid var(--ring); background: var(--surface-1); color: var(--ink); border-radius: 10px; padding: 12px 14px; cursor: pointer; }
+.choice b { display: block; font-size: 15px; }
+.choice span { font-size: 12.5px; color: var(--ink-2); }
+.choice kbd { float: right; font-size: 11px; color: var(--muted); border: 1px solid var(--ring); border-radius: 4px; padding: 0 5px; }
+.choice[aria-pressed="true"] { border-color: var(--s1); background: var(--surface-2); }
+.choice:focus-visible, .nav button:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+.nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.nav button { font: inherit; border: 1px solid var(--ring); background: var(--surface-1); color: var(--ink-2); border-radius: 8px; padding: 6px 14px; cursor: pointer; }
+.nav button:disabled { opacity: .4; cursor: default; }
+textarea { width: 100%; font: inherit; font-size: 14px; color: var(--ink); background: var(--surface-1); border: 1px solid var(--ring); border-radius: 8px; padding: 8px; margin-top: 12px; resize: vertical; min-height: 44px; }
+details { margin-top: 18px; }
+summary { cursor: pointer; color: var(--ink-2); font-size: 14px; }
+.guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px 16px; font-size: 13.5px; color: var(--ink-2); margin-top: 8px; }
+.guide b { color: var(--ink); }
+.summary { margin-top: 20px; }
+.summary h2 { font-size: 18px; margin: 0 0 10px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.tile { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; }
+.tile .k { font-size: 13px; color: var(--ink-2); }
+.tile .v { font-size: 28px; font-weight: 600; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.btn { font: inherit; font-size: 14px; border: 1px solid var(--ring); background: var(--surface-1); color: var(--ink); border-radius: 8px; padding: 7px 14px; cursor: pointer; }
+.note { font-size: 13px; color: var(--muted); margin-top: 10px; }
+.votes { margin-top: 16px; background: var(--surface-2); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: var(--ink-2); }
+.votes h3 { font-size: 14px; margin: 0 0 6px; color: var(--ink); }
+.votes .verdict { margin-top: 8px; color: var(--ink); }
+.votes .verdict b { font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Label check: the 40 most confident mistakes</h1>
+  <p class="lede">For each galaxy, the model disagrees with the label while being very sure. Look at the picture and decide: is the <b>label</b> wrong, or the <b>model</b>? Keys: <b>1</b> <b>2</b> <b>3</b> to choose, <b>←</b> <b>→</b> to move. For 15 of the 40, the Galaxy Zoo volunteers' own votes are public; they appear after you decide, so you can compare.</p>
+
+  <div class="top"><div class="prog" aria-hidden="true"><i id="prog"></i></div><span class="count" id="count"></span></div>
+
+  <div class="card">
+    <div class="main">
+      <div class="imgs">
+        <figure><img id="img-full" alt=""><figcaption>Full picture (with neighbours)</figcaption></figure>
+        <figure><img id="img-zoom" alt=""><figcaption>Zoomed on the centre</figcaption></figure>
+      </div>
+      <div>
+        <div class="fact"><div class="k">Label (Galaxy Zoo volunteers)</div><div class="v" id="lab"></div><div class="s" id="lab5"></div></div>
+        <div class="fact"><div class="k">Model's answer</div><div class="v" id="pred"></div></div>
+        <div id="probs"></div>
+        <textarea id="note" placeholder="Optional note, e.g. “two galaxies touching”"></textarea>
+      </div>
+    </div>
+    <div class="choices" role="group" aria-label="Your decision">
+      <button class="choice" data-v="label"><kbd>1</kbd><b>Label looks wrong</b><span>The model's answer fits the picture better</span></button>
+      <button class="choice" data-v="model"><kbd>2</kbd><b>Model is wrong</b><span>The label fits the picture</span></button>
+      <button class="choice" data-v="unsure"><kbd>3</kbd><b>Unsure</b><span>Both could be right, or I can't tell</span></button>
+    </div>
+    <div class="votes" id="votes" aria-live="polite"></div>
+    <div class="nav"><button id="prev">← Previous</button><button id="next">Next →</button></div>
+    <details>
+      <summary>What does each class look like?</summary>
+      <div class="guide">
+        <div><b>Spiral:</b> a disk with spiral arms winding out from the centre, sometimes with a bar across the middle.</div>
+        <div><b>Elliptical:</b> a smooth round or oval glow with no arms or structure.</div>
+        <div><b>Edge-on Disk:</b> a flat disk seen from the side, a thin line or narrow streak, sometimes with a central bulge.</div>
+        <div><b>Irregular (disturbed):</b> a single galaxy with a lopsided, distorted or messy shape.</div>
+        <div><b>Merger:</b> two or more galaxies touching or pulling at each other, often with tails or bridges of light.</div>
+      </div>
+    </details>
+  </div>
+
+  <div class="card summary">
+    <h2>Your results so far</h2>
+    <div class="tiles" id="tiles"></div>
+    <div class="row"><button class="btn" id="csv">Download results (CSV)</button><button class="btn" id="reset">Start over</button></div>
+    <p class="note">Your choices are saved in this browser, so you can close the page and continue later. Download the CSV to keep them in the project.</p>
+  </div>
+</div>
+
+<script src="label_check_data.js"></script>
+<script>
+(() => {
+const D = window.LABEL_CHECK, ITEMS = D.items, C = D.classes, KEY = "astrovision-label-check";
+const $ = id => document.getElementById(id);
+const pct = v => v === 0 ? "0%" : v < 0.001 ? "<0.1%" : (100 * v).toFixed(v < 0.01 ? 1 : 0) + "%";
+let ans = {}, i = 0;
+try { const s = JSON.parse(localStorage.getItem(KEY) || "{}"); ans = s.ans || {}; i = Math.min(s.i || 0, ITEMS.length - 1); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ ans, i })); } catch (e) {} };
+
+function render() {
+  const it = ITEMS[i], a = ans[it.idx] || {};
+  $("img-full").src = "data:image/jpeg;base64," + it.full; $("img-full").alt = `Galaxy ${it.idx}, full picture`;
+  $("img-zoom").src = "data:image/jpeg;base64," + it.zoom; $("img-zoom").alt = `Galaxy ${it.idx}, zoomed`;
+  $("lab").textContent = it.label10;
+  $("lab5").textContent = it.label10 === it.label5 ? "" : `merged into the model's class: ${it.label5}`;
+  $("pred").textContent = `${it.pred}, ${pct(it.conf)} sure`;
+  $("probs").innerHTML = it.probs.map((p, k) => `<div class="pbar"><span>${C[k]}</span><div class="t"><div class="f" style="width:${Math.max(1, p * 100)}%;background:${C[k] === it.pred ? "var(--hi)" : C[k] === it.label5 ? "var(--s1)" : "var(--base)"}"></div></div><span class="n">${pct(p)}</span></div>`).join("") +
+    `<div class="pbar" style="color:var(--muted)"><span></span><span><span style="color:var(--hi)">■</span> model's answer &nbsp; <span style="color:var(--s1)">■</span> label's class</span><span></span></div>`;
+  $("note").value = a.note || "";
+  document.querySelectorAll(".choice").forEach(b => b.setAttribute("aria-pressed", String(a.v === b.dataset.v)));
+  $("prev").disabled = i === 0; $("next").textContent = i === ITEMS.length - 1 ? "Done" : "Next →";
+  const n = Object.values(ans).filter(x => x.v).length;
+  $("count").textContent = `Galaxy ${i + 1} of ${ITEMS.length} · ${n} decided`;
+  $("prog").style.width = (100 * n / ITEMS.length) + "%";
+  renderVotes(it, a); renderSummary(); save();
+}
+const VERDICT = { "votes back label": ["Model is wrong", "most volunteers agree with the label", "model"],
+  "votes back model": ["Label looks wrong", "more volunteers chose the model's answer than the label", "label"],
+  "both fit": ["Both fit", "most volunteers support both answers, e.g. a spiral that is also disturbed", "unsure"],
+  "volunteers split": ["Split", "the volunteers themselves did not agree", "unsure"] };
+function renderVotes(it, a) {
+  const v = it.votes, el = $("votes");
+  if (!v) { el.innerHTML = `<h3>Volunteers' votes</h3>Not available: this galaxy is not in the public Galaxy Zoo vote catalogue.`; return; }
+  if (!a.v) { el.innerHTML = `<h3>Volunteers' votes</h3>Make your decision first, then the votes of ${v.n} volunteers appear here.`; return; }
+  const [name, why] = VERDICT[v.verdict];
+  el.innerHTML = `<h3>Volunteers' votes (${v.n} people): share whose answers point to each class</h3>` +
+    v.support.map((p, k) => `<div class="pbar"><span>${C[k]}</span><div class="t"><div class="f" style="width:${Math.max(1, p * 100)}%;background:${C[k] === it.pred ? "var(--hi)" : C[k] === it.label5 ? "var(--s1)" : "var(--base)"}"></div></div><span class="n">${pct(p)}</span></div>`).join("") +
+    `<div class="verdict">Volunteers' verdict: <b>${name}</b>: ${why}. ${agreeText(a.v, v.verdict)}</div>`;
+}
+const agrees = (mine, verdict) => VERDICT[verdict][2] === mine;
+const agreeText = (mine, verdict) => agrees(mine, verdict) ? "Your decision matches." : "Your decision differs.";
+function renderSummary() {
+  const vals = Object.values(ans).map(x => x.v).filter(Boolean), c = v => vals.filter(x => x === v).length;
+  const withVotes = ITEMS.filter(it => it.votes && (ans[it.idx] || {}).v);
+  const agreeN = withVotes.filter(it => agrees(ans[it.idx].v, it.votes.verdict)).length;
+  $("tiles").innerHTML = [["Decided", `${vals.length} / ${ITEMS.length}`], ["Label looks wrong", c("label")], ["Model is wrong", c("model")], ["Unsure", c("unsure")],
+    ["Agree with volunteers", withVotes.length ? `${agreeN} / ${withVotes.length}` : "–"]]
+    .map(([k, v]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+}
+function choose(v) { const it = ITEMS[i]; ans[it.idx] = { ...(ans[it.idx] || {}), v }; render(); if (!it.votes) setTimeout(() => go(1), 250); }
+function go(d) { const n = i + d; if (n >= 0 && n < ITEMS.length) { i = n; render(); } }
+document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => choose(b.dataset.v)));
+$("prev").addEventListener("click", () => go(-1));
+$("next").addEventListener("click", () => go(1));
+$("note").addEventListener("input", e => { const it = ITEMS[i]; ans[it.idx] = { ...(ans[it.idx] || {}), note: e.target.value }; save(); });
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "TEXTAREA") return;
+  if (e.key === "1") choose("label"); else if (e.key === "2") choose("model"); else if (e.key === "3") choose("unsure");
+  else if (e.key === "ArrowRight") go(1); else if (e.key === "ArrowLeft") go(-1);
+});
+$("csv").addEventListener("click", () => {
+  const esc = s => `"${String(s ?? "").replace(/"/g, '""')}"`;
+  const rows = [["rank", "idx", "label", "model_answer", "model_confidence", "decision", "volunteer_verdict", "volunteers", "note"]]
+    .concat(ITEMS.map((it, k) => [k + 1, it.idx, it.label10, it.pred, it.conf, (ans[it.idx] || {}).v || "", it.votes ? it.votes.verdict : "", it.votes ? it.votes.n : "", (ans[it.idx] || {}).note || ""]));
+  const blob = new Blob([rows.map(r => r.map(esc).join(",")).join("\n")], { type: "text/csv" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "label_check_results.csv"; a.click();
+});
+$("reset").addEventListener("click", () => { if (confirm("Delete all your choices and start over?")) { ans = {}; i = 0; render(); } });
+render();
+})();
+</script>
+</body>
+</html>

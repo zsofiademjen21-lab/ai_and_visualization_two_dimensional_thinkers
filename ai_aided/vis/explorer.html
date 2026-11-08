@@ -93,6 +93,13 @@ th:first-child, td:first-child { text-align: left; }
 .pbar .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
 .note { color: var(--muted); font-size: 12.5px; padding: 12px 0; grid-column: 1 / -1; }
 .foot { color: var(--muted); font-size: 12px; margin-top: 24px; }
+.lede a { color: var(--s1); }
+.guide { background: var(--surface-1); border: 1px solid var(--ring); border-radius: 12px; padding: 14px 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 20px; font-size: 13.5px; color: var(--ink-2); }
+@media (max-width: 860px) { .guide { grid-template-columns: minmax(0, 1fr); } }
+.guide b { color: var(--ink); }
+.guide .step { display: inline-flex; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: var(--surface-1); font-size: 12px; font-weight: 600; align-items: center; justify-content: center; margin-right: 8px; }
+.guide-note { grid-column: 1 / -1; margin: 0; font-size: 12.5px; color: var(--muted); }
+.look { display: block; margin-top: 3px; color: var(--ink); }
 .ctrls { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 4px; font-size: 12.5px; color: var(--ink-2); }
 select { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--surface-1); border: 1px solid var(--ring);
   border-radius: 6px; padding: 4px 6px; margin-left: 6px; }
@@ -106,48 +113,54 @@ select { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--
 <body>
 <div class="wrap">
   <h1>AstroVision Model Explorer</h1>
-  <p class="lede">Zoobot ConvNeXt-Nano fine-tuned on Galaxy10 DECals (zev-walker/astrovision-advanced). Click any matrix cell, row or column header to select galaxies; the embedding map and gallery follow the selection.</p>
+  <p class="lede">An interactive tool to explore where the galaxy classifier gets things right and wrong. For the short version, see <a href="findings.html">the key takeaways</a>.</p>
+  <div class="guide">
+    <div><span class="step">1</span><b>Pick a group of galaxies.</b> Click a square in the table of answers (for example "true Irregular, model says Spiral"), or use the "All mistakes" button.</div>
+    <div><span class="step">2</span><b>See where they are.</b> The selected galaxies light up on the map and appear as pictures in the gallery at the bottom.</div>
+    <div><span class="step">3</span><b>Click a picture</b> to see how sure the model was about each class.</div>
+    <p class="guide-note">The model has 5 classes: Spiral, Elliptical, Edge-on Disk, Irregular (also called "disturbed" galaxies) and Merger.</p>
+  </div>
 
   <div class="filters" role="toolbar" aria-label="Filters">
-    <div class="seg" data-key="split"><span>Split</span><button data-v="0">Validation</button><button data-v="1">Train</button></div>
-    <div class="seg" data-key="rows"><span>True labels</span><button data-v="5">5 merged classes</button><button data-v="10">10 original classes</button></div>
-    <div class="seg" data-key="norm"><span>Cells</span><button data-v="pct">Row %</button><button data-v="count">Counts</button></div>
+    <div class="seg" data-key="split"><span>Images</span><button data-v="0">New (not trained on)</button><button data-v="1">Training</button></div>
+    <div class="seg" data-key="rows"><span>True classes</span><button data-v="5">5 model classes</button><button data-v="10">10 detailed types</button></div>
+    <div class="seg" data-key="norm"><span>Show</span><button data-v="pct">Percent</button><button data-v="count">Number of galaxies</button></div>
   </div>
 
   <section class="tiles" id="tiles" aria-label="Summary"></section>
 
   <div class="grid">
     <section class="card">
-      <h2>Confusion matrix</h2>
-      <p class="sub" id="cm-sub">Rows: true class · Columns: predicted class · Shade = share of the row. Outlined cells are correct predictions.</p>
+      <h2>What the model answers for each true class</h2>
+      <p class="sub" id="cm-sub">Each row is one true class; each column is the model's answer. Outlined squares are correct answers. <span class="look">Look for: dark squares outside the outlined ones, which are common mistakes.</span></p>
       <div id="cm"></div>
       <div style="margin-top:8px"><button class="btn" id="tbl-toggle" aria-expanded="false">Show as table</button></div>
       <div id="cm-table" hidden></div>
     </section>
 
     <section class="card">
-      <h2>Recall by true class</h2>
-      <p class="sub">Share of each true class that the model assigns to the correct (merged) class.</p>
+      <h2>How often each class is recognised</h2>
+      <p class="sub">Share of each true class that the model gets right. <span class="look">Look for: short bars, which are classes the model struggles with.</span></p>
       <div id="recall"></div>
     </section>
 
     <section class="card">
-      <h2>Output map</h2>
-      <p class="sub">t-SNE of the model's output probabilities (black-box: no internal features), validation images only. Nearby galaxies got similar responses. Hover a point to see the galaxy; click it to inspect.</p>
+      <h2>Map of the model's answers</h2>
+      <p class="sub">Each dot is a galaxy. Galaxies close together got similar answers from the model (t-SNE of its output probabilities). Hover a dot to see the galaxy, click to inspect it. <span class="look">Look for: orange mistakes gathering in the same places.</span></p>
       <div class="ctrls"><label>Colour points by <select id="map-col"></select></label></div>
       <canvas id="emb" aria-label="t-SNE map of model output probabilities, validation images"></canvas>
       <div class="legend" id="emb-legend"></div>
     </section>
 
     <section class="card">
-      <h2>Calibration</h2>
-      <p class="sub">Does a prediction made with X% confidence turn out right X% of the time? Points on the diagonal = well calibrated.</p>
+      <h2>Is the model as sure as it should be?</h2>
+      <p class="sub">When the model says it is X% sure, is it right X% of the time? If yes, the dots lie on the grey diagonal line. <span class="look">Look for: dots below the line, where the model is overconfident.</span></p>
       <div id="calib"></div>
     </section>
 
     <section class="card wide">
-      <h2>Behaviour vs input properties</h2>
-      <p class="sub">For the chosen true class, what the model predicts across bins of a measured image property (equal-count bins). The grey bottom segment is the correct share; coloured segments show which class the model predicts instead. The label on top gives % correct. Click a segment to see those galaxies.</p>
+      <h2>Does the answer depend on what the galaxy looks like?</h2>
+      <p class="sub">Pick a property (for example apparent size) and a true class. Each bar is a group of galaxies, from low to high values of that property (same number of galaxies per bar). Grey = answered correctly, colours = what the model said instead; the number on top is % correct. Click a coloured part to see those galaxies. <span class="look">Look for: bars where the coloured part grows, which shows what makes the model go wrong.</span></p>
       <div class="ctrls">
         <label>Property <select id="prop-sel"></select></label>
         <label>True class <select id="cls-sel"></select></label>
@@ -161,8 +174,8 @@ select { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--
       <div class="gal-head">
         <div><h2 id="gal-title">Gallery</h2><p class="sub" id="gal-sub" style="margin:0"></p></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn" id="sel-wrong">All misclassified</button>
-          <div class="seg" data-key="sort"><span>Sort by confidence</span><button data-v="desc">High → low</button><button data-v="asc">Low → high</button></div>
+          <button class="btn" id="sel-wrong">All mistakes</button>
+          <div class="seg" data-key="sort"><span>Order by how sure</span><button data-v="desc">Most sure first</button><button data-v="asc">Least sure first</button></div>
         </div>
       </div>
       <div class="gal-body">
@@ -193,7 +206,7 @@ const clsParent = spec => spec.startsWith("10:") ? D.map10to5[+spec.slice(3)] : 
 const ORDER10 = [5, 6, 7, 2, 3, 4, 8, 9, 0, 1];   // grouped by merged parent class
 const SHORT = ["Spiral", "Ellip.", "Edge-on", "Irreg.", "Merger"];  // gallery captions
 const S = { split: 0, rows: "5", norm: "pct", sort: "desc", sel: { kind: "wrong" }, focus: null, shown: 96,
-  prop: 1, cls: "all", mapColor: "err" };
+  prop: 1, cls: "5:3", mapColor: "err" };   // opens on Irregular vs size: the clearest pattern
 const $ = id => document.getElementById(id);
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const isDark = () => css("--is-dark") === "1";
@@ -223,7 +236,7 @@ function inSel(d) {
 }
 function selLabel() {
   const s = S.sel; if (!s) return "Nothing selected";
-  if (s.kind === "wrong") return "All misclassified galaxies";
+  if (s.kind === "wrong") return "All mistakes";
   if (s.kind === "cell") return `True ${rowName(s.r)} → predicted ${C5[s.c]}`;
   if (s.kind === "row") return `All true ${rowName(s.r)}`;
   if (s.kind === "prop") return `${P[s.prop].name} ${fmt(s.lo)}–${fmt(s.hi)} · true ${clsName(s.cls)} · ` +
@@ -260,10 +273,10 @@ function renderTiles() {
   const macro = rec.reduce((a, b) => a + b, 0) / 5, worst = rec.indexOf(Math.min(...rec));
   const ece = calibBins(d).reduce((a, b) => a + b.n / n * Math.abs(b.acc - b.conf), 0);
   $("tiles").innerHTML = [
-    ["Accuracy", pct(acc), `${n.toLocaleString()} ${S.split ? "train" : "validation"} images · author reports 92.9% (val)`],
-    ["Macro recall", pct(macro), "unweighted mean over the 5 classes"],
-    ["Weakest class", pct(rec[worst]), `recall of ${C5[worst]}`],
-    ["Calibration error (ECE)", pct(ece), "gap between confidence and accuracy, 10 bins"],
+    ["Correct answers", pct(acc), `of ${n.toLocaleString()} ${S.split ? "training" : "new"} galaxies · the author reports 92.9%`],
+    ["Average per class", pct(macro), "each of the 5 classes counts equally"],
+    ["Hardest class", pct(rec[worst]), `of ${C5[worst]} galaxies are recognised`],
+    ["Confidence gap", pct(ece), "how far its confidence is from reality, on average"],
   ].map(([k, v, s]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${s}</div></div>`).join("");
 }
 
@@ -275,9 +288,9 @@ function renderCM() {
   const LW = S.rows === "5" ? 104 : 176, CW = 70, CH = S.rows === "5" ? 44 : 32, TOP = 40, GAP = 2;
   const W = LW + 5 * CW + 56, H = TOP + rows.length * CH + 8;
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Confusion matrix">`;
-  s += `<text x="${LW + 2.5 * CW}" y="11" text-anchor="middle" style="fill:var(--muted)">predicted →</text>`;
+  s += `<text x="${LW + 2.5 * CW}" y="11" text-anchor="middle" style="fill:var(--muted)">model's answer →</text><text x="${LW - 8}" y="11" text-anchor="end" style="fill:var(--muted)">true class ↓</text>`;
   C5.forEach((c, j) => s += `<g class="hdr" data-col="${j}"><text x="${LW + j * CW + CW / 2}" y="${TOP - 8}" text-anchor="middle">${esc(c)}</text></g>`);
-  s += `<text x="${LW + 5 * CW + 8}" y="${TOP - 8}" style="fill:var(--muted)">n</text>`;
+  s += `<text x="${LW + 5 * CW + 8}" y="${TOP - 8}" style="fill:var(--muted)">galaxies</text>`;
   rows.forEach((k, i) => {
     const y = TOP + i * CH, par = rowParent(k);
     s += `<g class="hdr" data-row="${k}"><text x="${LW - 8}" y="${y + CH / 2 + 4}" text-anchor="end">${esc(rowName(k))}</text></g>`;
@@ -356,15 +369,15 @@ function renderCalib() {
     s += `<text x="${X(t)}" y="${TOP + P + 16}" text-anchor="middle" style="fill:var(--muted)">${t * 100}%</text>`;
   });
   s += `<line x1="${X(0)}" y1="${Y(0)}" x2="${X(1)}" y2="${Y(1)}" stroke="var(--axis)" stroke-width="1.5"/>`;
-  s += `<text x="${X(.62)}" y="${Y(.56)}" style="fill:var(--muted)" transform="rotate(-45 ${X(.62)} ${Y(.56)})">perfect calibration</text>`;
-  s += `<text x="${X(.5)}" y="${TOP + P + 30}" text-anchor="middle">mean confidence in bin</text>`;
-  s += `<text x="12" y="${Y(.5)}" text-anchor="middle" transform="rotate(-90 12 ${Y(.5)})">accuracy</text>`;
+  s += `<text x="${X(.62)}" y="${Y(.56)}" style="fill:var(--muted)" transform="rotate(-45 ${X(.62)} ${Y(.56)})">perfectly honest</text>`;
+  s += `<text x="${X(.5)}" y="${TOP + P + 30}" text-anchor="middle">how sure the model was</text>`;
+  s += `<text x="12" y="${Y(.5)}" text-anchor="middle" transform="rotate(-90 12 ${Y(.5)})">% right</text>`;
   s += `<polyline points="${B.map(b => `${X(b.conf)},${Y(b.acc)}`).join(" ")}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/>`;
   B.forEach((b, i) => s += `<circle class="cb" data-i="${i}" cx="${X(b.conf)}" cy="${Y(b.acc)}" r="5" fill="var(--s1)" stroke="var(--surface-1)" stroke-width="2"/>
      <circle class="cb" data-i="${i}" cx="${X(b.conf)}" cy="${Y(b.acc)}" r="14" fill="transparent"/>`);
   // share-of-images strip (its own scale, below the plot)
   const y0 = TOP + P + 60, mx = Math.max(...B.map(b => b.n));
-  s += `<text x="${L}" y="${y0 - 2}" style="fill:var(--muted)">share of images per confidence bin</text>`;
+  s += `<text x="${L}" y="${y0 - 2}" style="fill:var(--muted)">how many galaxies fall in each group</text>`;
   B.forEach((b, i) => { const h = Math.max(1, b.n / mx * (HS - 8)); s += `<rect class="cb" data-i="${i}" x="${X(b.lo) + 1}" y="${y0 + HS - h}" width="${P / 10 - 2}" height="${h}" rx="2" fill="var(--muted)" opacity=".55"/>`; });
   s += `<line x1="${X(0)}" x2="${X(1)}" y1="${y0 + HS}" y2="${y0 + HS}" stroke="var(--axis)"/>`;
   $("calib").innerHTML = s + "</svg>";
@@ -387,12 +400,12 @@ function propBins(d, k) {
 function renderProp() {
   const k = S.prop, all = S.cls === "all";
   const d = cur().filter(x => clsMatch(x, S.cls) && x.q[k] != null);
-  $("prop-desc").textContent = P[k] ? `${P[k].name}: ${P[k].desc}. ${d.length} ${S.split ? "train" : "validation"} images with a value.` : "";
+  $("prop-desc").textContent = P[k] ? `${P[k].name}: ${P[k].desc}. ${d.length} ${S.split ? "training" : "new"} galaxies.` : "";
   if (!d.length) { $("propchart").innerHTML = `<p class="note">No images with this property.</p>`; return; }
   const bins = propBins(d, k), par = all ? null : clsParent(S.cls);
   // segment order: correct first (bottom), then the other predicted classes
   // correct share is drawn neutral so the eye goes to the errors; errors keep their predicted-class colour
-  const segs = all ? [{ key: -2, name: "correct", col: "var(--axis)" }, { key: -1, name: "misclassified", col: "var(--s2)" }]
+  const segs = all ? [{ key: -2, name: "correct", col: "var(--axis)" }, { key: -1, name: "mistake", col: "var(--s2)" }]
     : [par, ...[0, 1, 2, 3, 4].filter(c => c !== par)].map(c => ({ key: c, name: C5[c], col: c === par ? "var(--axis)" : CCOL(c) }));
   const L = 44, PW = 820, PH = 220, TOP = 22, W = L + PW + 10, H = TOP + PH + 44;
   const bw = PW / bins.length, Y = v => TOP + (1 - v) * PH;
@@ -411,7 +424,7 @@ function renderProp() {
     });
     s += `<text x="${x + w / 2}" y="${TOP - 6}" text-anchor="middle" style="fill:var(--ink);font-variant-numeric:tabular-nums">${pct(ok, 0)}</text>`;
     s += `<text x="${x + w / 2}" y="${TOP + PH + 16}" text-anchor="middle" style="font-variant-numeric:tabular-nums">${fmt(b.lo)}–${fmt(b.hi)}</text>`;
-    s += `<text x="${x + w / 2}" y="${TOP + PH + 30}" text-anchor="middle" style="fill:var(--muted)">n=${n}</text>`;
+    s += `<text x="${x + w / 2}" y="${TOP + PH + 30}" text-anchor="middle" style="fill:var(--muted)">${n} galaxies</text>`;
   });
   s += `<text x="${L + PW / 2}" y="${H - 1}" text-anchor="middle" style="fill:var(--muted)">${esc(P[k].name)} (low → high)</text>`;
   $("propchart").innerHTML = s + "</svg>";
@@ -442,7 +455,7 @@ function renderEmb() {
     embPts.forEach(p => { if (p.d.pred === p.d.l5) { ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, 7); ctx.fill(); } });
     ctx.globalAlpha = showSel ? 0.45 : 0.9; ctx.fillStyle = s2;
     embPts.forEach(p => { if (p.d.pred !== p.d.l5 && !(showSel && selIds.has(p.d.idx))) { ctx.beginPath(); ctx.arc(p.x, p.y, 2.6, 0, 7); ctx.fill(); } });
-    legendBase = `<span><i style="background:${muted}"></i>correctly classified</span><span><i style="background:${s2}"></i>misclassified</span>`;
+    legendBase = `<span><i style="background:${muted}"></i>correct</span><span><i style="background:${s2}"></i>mistake</span>`;
   } else {
     // sequential one-hue ramp over the 2nd–98th percentile; marks start at a mid step so low values stay visible
     const k = +S.mapColor, v = embPts.map(p => p.d.q[k]).filter(x => x != null).sort((a, b) => a - b);
@@ -459,7 +472,7 @@ function renderEmb() {
   if (f) { ctx.beginPath(); ctx.arc(f.x, f.y, 8, 0, 7); ctx.lineWidth = 2; ctx.strokeStyle = css("--ink"); ctx.stroke(); }
   $("emb-legend").innerHTML = legendBase +
     (showSel ? `<span><i style="background:${selCol}"></i>selected: ${esc(selLabel())} (${sel.length})</span>` : "") +
-    (S.split === 1 ? `<span>Map shows validation images; matrix shows train.</span>` : "");
+    (S.split === 1 ? `<span>The map always shows the new galaxies; the table above shows training galaxies.</span>` : "");
 }
 function nearest(e) {
   const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
@@ -484,11 +497,11 @@ function renderGallery() {
   $("gal-title").textContent = "Gallery · " + selLabel();
   if (S.split === 1) {
     $("gal-sub").textContent = "";
-    $("gallery").innerHTML = `<p class="note">Thumbnails are stored for validation images only. Switch the split to Validation to browse the selected galaxies.</p>`;
+    $("gallery").innerHTML = `<p class="note">Pictures are only available for the new galaxies. Switch "Images" at the top to "New" to see them.</p>`;
     $("more").hidden = true; return;
   }
   const items = galleryItems();
-  $("gal-sub").textContent = `${items.length} validation images · caption = predicted class and its probability`;
+  $("gal-sub").textContent = `${items.length} galaxies · under each picture: the model's answer and how sure it was (✗ = wrong)`;
   $("gallery").innerHTML = items.slice(0, S.shown).map(d => `<button class="thumb" data-i="${d.idx}" aria-current="${d.idx === S.focus}" title="${esc(C10[d.l10])} → ${esc(C5[d.pred])}">
       <img loading="lazy" src="${thumb(d.idx)}" alt="${esc(C10[d.l10])} galaxy, predicted ${esc(C5[d.pred])}">
       <div class="c">${d.pred === d.l5 ? "" : "✗ "}${SHORT[d.pred]} ${pct(d.conf, 0)}</div></button>`).join("") ||
@@ -526,8 +539,9 @@ $("prop-sel").innerHTML = P.map((p, i) => `<option value="${i}">${esc(p.name)}</
 $("cls-sel").innerHTML = `<option value="all">All classes (correct vs wrong)</option><optgroup label="5 merged classes">` +
   C5.map((c, i) => `<option value="5:${i}">${esc(c)}</option>`).join("") + `</optgroup><optgroup label="10 original classes">` +
   ORDER10.map(i => `<option value="10:${i}">${esc(C10[i])}</option>`).join("") + "</optgroup>";
-$("map-col").innerHTML = `<option value="err">correct / misclassified</option>` + P.map((p, i) => `<option value="${i}">${esc(p.name)}</option>`).join("");
+$("map-col").innerHTML = `<option value="err">correct / mistake</option>` + P.map((p, i) => `<option value="${i}">${esc(p.name)}</option>`).join("");
 $("prop-sel").value = String(S.prop);
+$("cls-sel").value = S.cls;
 $("prop-sel").addEventListener("change", e => { S.prop = +e.target.value; renderProp(); });
 $("cls-sel").addEventListener("change", e => { S.cls = e.target.value; renderProp(); });
 $("map-col").addEventListener("change", e => { S.mapColor = e.target.value; renderEmb(); });
