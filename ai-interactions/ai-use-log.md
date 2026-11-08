@@ -36,7 +36,7 @@ Then it asked me to upload a screenshot of the AstroVision results for one or tw
 
 | Image | True Label | Prediction | Confidence | Merger Probability |
 |:------|:-----------|:-----------|-----------:|-------------------:|
-| ![m001_heic1811a](../ai_aided/chatgpt/figures/merger%20galaxies/m001_heic1811a.png) | Merger | Irregular galaxy | 97,40% | 0,04% |
+| <img src="../ai_aided/chatgpt/figures/merger%20galaxies/m001_heic1811a.jpg" width="100">  | Merger | Irregular galaxy | 97,40% | 0,04% |
 	
 I uploaded the image. Also, I told ChatGPT to treat the model as a black box.
 	
