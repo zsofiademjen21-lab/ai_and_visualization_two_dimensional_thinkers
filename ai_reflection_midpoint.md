@@ -7,7 +7,8 @@ Zsófia Demjén-Nagy k12413807
 Livia Koch  k09956227
 
 
-Tool: Claude Code. Full record: [ai-interactions/ai-use-log.md](ai-interactions/ai-use-log.md).
+Tool: Claude Code, ChatGPT
+Full record: [ai-interactions/ai-use-log.md](ai-interactions/ai-use-log.md).
 
 ## What the AI did for us
 
@@ -35,9 +36,9 @@ Checking is quicker than building, but it is real work. It only works if you kno
 
 ## How confident are we in our conclusions, and why?
 
-- **High confidence:** the disturbed-galaxy blind spot, loss of detail causing "Elliptical" mistakes, the fragility of disturbed predictions, and the much weaker results for the rare classes on new images. These are based on hundreds of images, hold on both the training and validation data, and the causes were tested by editing images where possible. That rarity causes the weak rare classes, and that the gap is memorisation, are interpretations we could not test in Phase I.
+- **High confidence:** the irregular-galaxy blind spot, loss of detail causing "Elliptical" mistakes, the fragility of irregular predictions, and the much weaker results for the rare classes on new images. These are based on hundreds of images, hold on both the training and validation data, and the causes were tested by editing images where possible. That rarity causes the weak rare classes, and that the gap is memorisation, are interpretations we could not test in Phase I.
 - **Medium confidence:** the map regions. The same bridges and hidden group came back when we rebuilt the map from three other random starts, but the exact number of regions changed.
-- **Corrected by data:** the AI's visual impression suggested that many confident mistakes were wrong labels. The volunteers' own votes showed this explains only about 1 in 10 mistakes; most "disturbed" galaxies called Spiral are disturbed spirals, where both answers fit. A good example of why an AI's visual judgement needs checking against real data.
+- **Corrected by data:** the AI's visual impression suggested that many confident mistakes were wrong labels. The volunteers' own votes showed this explains only about 1 in 10 mistakes; most "irregular" galaxies called Spiral are disturbed spirals, where both answers fit. A good example of why an AI's visual judgement needs checking against real data.
 
 ## Strengths and limitations of AI assistance
 
@@ -54,7 +55,7 @@ Checking is quicker than building, but it is real work. It only works if you kno
 
 ## Points to compare with the human-only pair
 
-- Did they find the disturbed-galaxy blind spot and the size/detail effect, and did they test the cause or only observe it?
+- Did they find the irregular-galaxy blind spot and the size/detail effect, and did they test the cause or only observe it?
 - Did they also see the colour pattern, and did they conclude that the model uses colour?
 - How did their visualisations differ? Ours are interactive and linked, and include before/after image pairs.
 - Did they find something we missed because the AI steered us in a particular direction?

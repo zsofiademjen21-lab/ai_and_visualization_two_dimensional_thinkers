@@ -274,6 +274,20 @@ Claude corrected the findings page, report, reflection, slides and figures.
 
 ---
 
+## 16. Changing "disturbed" back to the model's name "Irregular"
+
+**Prompts:** "change back the modified "disturbed" name to the original "irregular"
+
+**What happened:** The model's class is called "Irregular Galaxy". The same galaxies are called "Disturbed Galaxies" in the original Galaxy10 labels. Claude switched from "Irregular" to "disturbed" when it wrote the first findings page (§5), because that analysis used the original 10 Galaxy10 classes. It never told me or asked. Later it even converted the model's name to "Disturbed" on purpose to match the rest of the page (§11). As a result the documents used two names for the same class: the model, explorer and label-check page said "Irregular", while the findings page, report and slides said "disturbed".
+
+**What Claude did:** It changed the findings page, report, reflection, slides and figures back to "Irregular", and explained the name once ("called 'Disturbed' in the original Galaxy10 labels"). It kept "disturbed spirals" only in the volunteer-vote finding, where the original meaning matters. Earlier log entries were left unchanged, because they record what was written at the time.
+
+**What went wrong:** Claude's own conversion script also replaced the word inside the new explanation, so it read "Irregular is called Irregular". Claude caught this when checking the rendered page and fixed it.
+
+**My decision:** Accepted. We now use the model's own class names, which also makes the comparison with the human-only pair easier.
+
+---
+
 ## Which AI suggestions we accepted, changed or rejected
 
 | AI suggestion | Decision | Why |
@@ -322,6 +336,7 @@ The section numbers point to the log entries above.
 - Page text can contain hard-coded values that no longer match the data, such as region numbers written by hand (§11).
 - A result can be carried over to a subgroup where it was never checked. "The hidden groups are disturbed spirals" came from the overall vote result, and the few votes in those regions mostly back the label (§15).
 - The first version of the output is often correct but too detailed and full of jargon for the audience (§6, §12).
+- The AI can change terminology without saying so. It switched from the model's class name "Irregular" to the dataset's "Disturbed", so the documents used two names for the same class (§16).
 
 **Experiments and images**
 - Edited test images can contain artefacts (flat grey padding, square boxes, hard circle edges) that the model may react to instead of the real change (§7, §9).

@@ -79,10 +79,10 @@ svg text { fill: var(--ink-2); font-size: 14px; }
 
   <section class="card">
     <div class="num">Takeaway 1</div>
-    <h2>The model often fails to recognise disturbed galaxies</h2>
+    <h2>The model often fails to recognise irregular galaxies</h2>
     <p class="say" id="t1-say"></p>
     <div id="t1-chart"></div>
-    <p class="ex-t">Examples: disturbed galaxies the model got wrong</p>
+    <p class="ex-t">Examples: irregular galaxies the model got wrong</p>
     <div class="ex" id="t1-ex"></div>
   </section>
 
@@ -99,10 +99,10 @@ svg text { fill: var(--ink-2); font-size: 14px; }
 
   <section class="card">
     <div class="num">Takeaway 3 <span class="tag">tested by editing images</span></div>
-    <h2>Small, harmless changes flip the answer for disturbed galaxies</h2>
+    <h2>Small, harmless changes flip the answer for irregular galaxies</h2>
     <p class="say" id="t3-say"></p>
     <div id="t3-chart"></div>
-    <p class="ex-t">Examples: the same disturbed galaxy, just rotated by 90°</p>
+    <p class="ex-t">Examples: the same irregular galaxy, just rotated by 90°</p>
     <div class="pairs" id="t3-ex"></div>
   </section>
 
@@ -120,7 +120,7 @@ svg text { fill: var(--ink-2); font-size: 14px; }
     <div id="t5-chart"></div>
     <p class="ex-t">Examples: the model's most confident mistakes (true label → model's answer)</p>
     <div class="ex" id="t5-ex"></div>
-    <p class="note"><b>Are the labels wrong? Checked with the volunteers' own votes.</b> For the 202 mistakes (validation and training) whose Galaxy Zoo votes are public (about 45% of galaxies), the votes back the label in 54% of cases, the volunteers were split in 18%, both answers fit in 17%, and the votes back the model in only 10%. So wrong labels explain only about 1 in 10 mistakes. When the model calls a disturbed galaxy a spiral, it is usually a <b>disturbed spiral</b>: most volunteers saw both the disturbance and the spiral arms, so the five classes force one answer for a galaxy that is both.</p>
+    <p class="note"><b>Are the labels wrong? Checked with the volunteers' own votes.</b> For the 202 mistakes (validation and training) whose Galaxy Zoo votes are public (about 45% of galaxies), the votes back the label in 54% of cases, the volunteers were split in 18%, both answers fit in 17%, and the votes back the model in only 10%. So wrong labels explain only about 1 in 10 mistakes. When the model calls a irregular galaxy a spiral, it is usually a <b>disturbed spiral</b>: most volunteers saw both the disturbance and the spiral arms, so the five classes force one answer for a galaxy that is both.</p>
   </section>
 
   <section class="card">
@@ -140,7 +140,7 @@ svg text { fill: var(--ink-2); font-size: 14px; }
     <h2>What does <i>not</i> confuse the model</h2>
     <p class="say">Some things looked like they might matter, so we changed them on purpose. The answers barely moved.</p>
     <div class="nope" id="t6"></div>
-    <p class="note">Colour is the important one: in the real images, red disturbed galaxies <i>are</i> called Elliptical far more often than blue ones, so it looked like the model judges by colour. The test shows it doesn't. The volunteers do call red disturbed galaxies “smooth” more often than blue ones (37% vs 28%), so a smoother shape, not the colour itself, is the likely reason.</p>
+    <p class="note">Colour is the important one: in the real images, red irregular galaxies <i>are</i> called Elliptical far more often than blue ones, so it looked like the model judges by colour. The test shows it doesn't. The volunteers do call red irregular galaxies “smooth” more often than blue ones (37% vs 28%), so a smoother shape, not the colour itself, is the likely reason.</p>
   </section>
 
   <p class="foot">Data: Galaxy10 DECals validation images (not used for training). "Tested by editing images": we changed one thing in the images (size, blur, colour, shape, rotation, position or neighbours) and ran the model again on the same galaxies (705 and 1,115 galaxies in two tests). Numbers are calculated live from the model's predictions. For details, open explorer.html.</p>
@@ -160,7 +160,7 @@ const BY = new Map(R.map(d => [d.idx, d]));
 const ok = d => d.pred === d.l5, $ = id => document.getElementById(id);
 const pct = v => { const p = 100 * v; return (p > 0 && p < 2 ? p.toFixed(1) : Math.round(p)) + "%"; };
 const share = (arr, f) => arr.length ? arr.filter(f).length / arr.length : 0;
-const NICE = { 0: "Disturbed", 1: "Merger", 2: "Round elliptical", 3: "Elliptical", 4: "Cigar elliptical", 5: "Barred spiral",
+const NICE = { 0: "Irregular", 1: "Merger", 2: "Round elliptical", 3: "Elliptical", 4: "Cigar elliptical", 5: "Barred spiral",
   6: "Spiral", 7: "Loose spiral", 8: "Edge-on disk", 9: "Edge-on disk" };
 
 // edited-image tests: one object per galaxy, {edit: prediction}
@@ -195,16 +195,16 @@ function bars(id, rows, max = 1) {
   $(id).innerHTML = s + "</svg>";
 }
 
-$("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocaleString()} galaxy images it had not been trained on. Overall it is right ${pct(share(VAL, ok))} of the time, the same as the author reports. But that single number hides seven important things about how it behaves.`;
+$("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocaleString()} galaxy images it had not been trained on. Overall it is right ${pct(share(VAL, ok))} of the time, the same as the author reports. (The model's class “Irregular” is called “Disturbed” in the original Galaxy10 labels.) But that single number hides seven important things about how it behaves.`;
 
-// ---------- 1: disturbed galaxies ----------
+// ---------- 1: irregular galaxies ----------
 {
   const dist = VAL.filter(d => d.l10 === 0), rest = VAL.filter(d => d.l10 !== 0);
   bars("t1-chart", [
     { label: "All other galaxy types", v: share(rest, ok) },
-    { label: "Disturbed galaxies", v: share(dist, ok), hi: true },
+    { label: "Irregular galaxies", v: share(dist, ok), hi: true },
   ]);
-  $("t1-say").innerHTML = `It recognises <b>only ${pct(share(dist, ok))}</b> of disturbed galaxies, compared with ${pct(share(rest, ok))} for all other types. When it gets them wrong, it mostly calls them <b>Spiral (${pct(share(dist, d => d.pred === 0))})</b> or <b>Elliptical (${pct(share(dist, d => d.pred === 1))})</b>.`;
+  $("t1-say").innerHTML = `It recognises <b>only ${pct(share(dist, ok))}</b> of irregular galaxies, compared with ${pct(share(rest, ok))} for all other types. When it gets them wrong, it mostly calls them <b>Spiral (${pct(share(dist, d => d.pred === 0))})</b> or <b>Elliptical (${pct(share(dist, d => d.pred === 1))})</b>.`;
   const wrong = dist.filter(d => !ok(d)).sort((a, b) => b.conf - a.conf);
   examples("t1-ex", [...wrong.filter(d => d.pred === 0).slice(0, 3), ...wrong.filter(d => d.pred === 1).slice(0, 3)], d => `called ${C5[d.pred]}`);
 }
@@ -218,7 +218,7 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
     { label: "Spirals, blurred (same size)", v: E(sp2, "blur"), hi: true },
   ], 0.5);
   const dist = VAL.filter(d => d.l10 === 0 && d.q[1] != null).sort((a, b) => a.q[1] - b.q[1]), cut = Math.round(dist.length * 0.4);
-  $("t2-say").innerHTML = `In the real images, small disturbed galaxies are called Elliptical much more often than large ones (${pct(share(dist.slice(0, cut), d => d.pred === 1))} vs ${pct(share(dist.slice(cut), d => d.pred === 1))}). To find the cause, we edited the same spirals. <b>Shrinking</b> them, or just <b>blurring</b> them at the same size, makes the model call them Elliptical far more often (chart). So the cause is the <b>loss of detail</b>, not the size itself. Real ellipticals stay ellipticals (${pct(share(of(T1, 1), t => t.shrink === 1))} after shrinking).`;
+  $("t2-say").innerHTML = `In the real images, small irregular galaxies are called Elliptical much more often than large ones (${pct(share(dist.slice(0, cut), d => d.pred === 1))} vs ${pct(share(dist.slice(cut), d => d.pred === 1))}). To find the cause, we edited the same spirals. <b>Shrinking</b> them, or just <b>blurring</b> them at the same size, makes the model call them Elliptical far more often (chart). So the cause is the <b>loss of detail</b>, not the size itself. Real ellipticals stay ellipticals (${pct(share(of(T1, 1), t => t.shrink === 1))} after shrinking).`;
   pairs("t2-ex1", "shrink", "unchanged", "shrunk");
   pairs("t2-ex2", "blur", "unchanged", "blurred");
 }
@@ -229,13 +229,13 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
   const ch = (arr, k) => share(arr, t => t[k] !== t.original);
   bars("t3-chart", [
     { label: "Rotated 90° · spirals & ellipticals", v: ch(others1, "rot90") },
-    { label: "Rotated 90° · disturbed", v: ch(of(T1, 3), "rot90"), hi: true, gap: true },
+    { label: "Rotated 90° · irregular", v: ch(of(T1, 3), "rot90"), hi: true, gap: true },
     { label: "Moved off-centre · spirals & ellipticals", v: ch(others2, "shift") },
-    { label: "Moved off-centre · disturbed", v: ch(of(T2, 3), "shift"), hi: true, gap: true },
+    { label: "Moved off-centre · irregular", v: ch(of(T2, 3), "shift"), hi: true, gap: true },
     { label: "Blurred · spirals & ellipticals", v: ch(others2, "blur") },
-    { label: "Blurred · disturbed", v: ch(of(T2, 3), "blur"), hi: true },
+    { label: "Blurred · irregular", v: ch(of(T2, 3), "blur"), hi: true },
   ], 0.5);
-  $("t3-say").innerHTML = `A galaxy is still the same galaxy when the picture is rotated or moved, and the model was even trained on rotated images. Still, these small changes <b>flip the answer for many disturbed galaxies</b>: ${pct(ch(of(T1, 3), "rot90"))} after rotating and ${pct(ch(of(T2, 3), "shift"))} after moving, far more than for spirals and ellipticals (chart: share of answers that change). For disturbed galaxies the model is unsure and close to a tipping point: the ones whose answer flips when rotated were already unsure (median confidence 70%, against 94% for those that stay the same).`;
+  $("t3-say").innerHTML = `A galaxy is still the same galaxy when the picture is rotated or moved, and the model was even trained on rotated images. Still, these small changes <b>flip the answer for many irregular galaxies</b>: ${pct(ch(of(T1, 3), "rot90"))} after rotating and ${pct(ch(of(T2, 3), "shift"))} after moving, far more than for spirals and ellipticals (chart: share of answers that change). For irregular galaxies the model is unsure and close to a tipping point: the ones whose answer flips when rotated were already unsure (median confidence 70%, against 94% for those that stay the same).`;
   pairs("t3-ex", "rotate", "original", "rotated 90°");
 }
 
@@ -244,14 +244,14 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
   const acc = (arr, f) => share(arr.filter(f), ok);
   const rare = [0, 4], common = d => !rare.includes(d.l10);
   bars("t4-chart", [
-    { label: "Disturbed · training images", v: acc(TR, d => d.l10 === 0) },
-    { label: "Disturbed · new images", v: acc(VAL, d => d.l10 === 0), hi: true, gap: true },
+    { label: "Irregular · training images", v: acc(TR, d => d.l10 === 0) },
+    { label: "Irregular · new images", v: acc(VAL, d => d.l10 === 0), hi: true, gap: true },
     { label: "Cigar ellipticals · training images", v: acc(TR, d => d.l10 === 4) },
     { label: "Cigar ellipticals · new images", v: acc(VAL, d => d.l10 === 4), hi: true, gap: true },
     { label: "All other types · training images", v: acc(TR, common) },
     { label: "All other types · new images", v: acc(VAL, common) },
   ]);
-  $("t4-say").innerHTML = `For most galaxy types, the model does about as well on new images as on the images it was trained on. For the two <b>rarest</b> types it doesn't: disturbed galaxies drop from <b>${pct(acc(TR, d => d.l10 === 0))} to ${pct(acc(VAL, d => d.l10 === 0))}</b>, cigar-shaped ellipticals from ${pct(acc(TR, d => d.l10 === 4))} to ${pct(acc(VAL, d => d.l10 === 4))} (chart: share correct). This looks like memorisation: the model seems to have remembered the few examples it saw rather than learned what these galaxies look like. Their rarity may be one reason, but we can't prove that without retraining the model. Even on its training images it gets ${pct(1 - acc(TR, d => d.l10 === 0))} of disturbed galaxies wrong, and the volunteers' votes show why: many of them are spirals that are also disturbed, so two answers fit.`;
+  $("t4-say").innerHTML = `For most galaxy types, the model does about as well on new images as on the images it was trained on. For the two <b>rarest</b> types it doesn't: irregular galaxies drop from <b>${pct(acc(TR, d => d.l10 === 0))} to ${pct(acc(VAL, d => d.l10 === 0))}</b>, cigar-shaped ellipticals from ${pct(acc(TR, d => d.l10 === 4))} to ${pct(acc(VAL, d => d.l10 === 4))} (chart: share correct). This looks like memorisation: the model seems to have remembered the few examples it saw rather than learned what these galaxies look like. Their rarity may be one reason, but we can't prove that without retraining the model. Even on its training images it gets ${pct(1 - acc(TR, d => d.l10 === 0))} of irregular galaxies wrong, and the volunteers' votes show why: many of them are spirals that are also disturbed, so two answers fit.`;
 }
 
 // ---------- 5: confident mistakes ----------
@@ -261,7 +261,7 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
     { label: "Mistakes, less than 90% sure", v: 1 - sure.length / wrong.length },
     { label: "Mistakes, 90% sure or more", v: sure.length / wrong.length, hi: true },
   ]);
-  $("t5-say").innerHTML = `Of its ${wrong.length} mistakes, <b>${sure.length} (about 1 in 3)</b> were made while the model was at least 90% sure. So you can't rely on its confidence to spot when it's wrong. Almost half of these confident mistakes (${sure.filter(d => d.l10 === 0).length}) are disturbed galaxies again.`;
+  $("t5-say").innerHTML = `Of its ${wrong.length} mistakes, <b>${sure.length} (about 1 in 3)</b> were made while the model was at least 90% sure. So you can't rely on its confidence to spot when it's wrong. Almost half of these confident mistakes (${sure.filter(d => d.l10 === 0).length}) are irregular galaxies again.`;
   examples("t5-ex", sure.sort((a, b) => b.conf - a.conf).slice(0, 6), d => `${NICE[d.l10]} → ${C5[d.pred]}`);
 }
 
@@ -281,8 +281,8 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
   });
   $("m-map").innerHTML = s + "</svg>";
   $("m-legend").innerHTML = `<span><i style="background:var(--base)"></i>correct</span><span><i style="background:var(--hi)"></i>mistake</span><span>Each dot is one galaxy. Galaxies close together got similar answers from the model.</span>`;
-  const nice = n => n.kind === "bridge" ? "Torn between " + n.label.replace(" ↔ ", " and ").replace("Irregular", "Disturbed")
-    : n.label.replace(" Irregular hidden among Spiral", " are disturbed galaxies hidden among spirals");
+  const nice = n => n.kind === "bridge" ? "Torn between " + n.label.replace(" ↔ ", " and ")
+    : n.label.replace(" Irregular hidden among Spiral", " are irregular galaxies hidden among spirals");
   const nums = kind => MD.notes.map((n, i) => n.kind === kind ? i + 1 : null).filter(Boolean).join(", ");
   $("m-regions").innerHTML = MD.notes.map((n, i) => { const r = regs.get(n.id);
     return `<div><span class="badge">${i + 1}</span><span><b>${nice(n)}</b><br>${r.n} galaxies · ${pct(r.err)} wrong · model ${pct(n.conf)} sure on average</span></div>`; }).join("");
@@ -292,10 +292,10 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
   const pairCount = {};
   unsure.forEach(d => { const o = d.p.map((v, i) => [v, i]).sort((a, b) => b[0] - a[0]); const k = [o[0][1], o[1][1]].sort().map(i => C5[i]).join(" / "); pairCount[k] = (pairCount[k] || 0) + 1; });
   const top = Object.entries(pairCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  bars("m-pairs", top.map(([k, n], i) => ({ label: k.replace("Irregular", "Disturbed"), v: n / unsure.length, hi: k.includes("Spiral") })), 0.3);
+  bars("m-pairs", top.map(([k, n], i) => ({ label: k, v: n / unsure.length, hi: k.includes("Spiral") })), 0.3);
   const wrong = pts.filter(d => !ok(d));
-  $("m-say").innerHTML = `This map places every galaxy by the model's answer: galaxies close together got similar answers. Most of the map is made of <b>dense islands where the model is completely sure and almost never wrong</b>. The mistakes (orange) sit in two kinds of places: on <b>bridges between two islands</b>, where the model is torn between two classes (${nums("bridge")}), and in <b>groups hidden inside the Spiral island</b>, where the model is sure but about a quarter of the galaxies are actually disturbed (${nums("hidden")}).`;
-  $("m-note").innerHTML = `<b>What the map tells us.</b> When the model is unsure, it is almost never confused in general: in ${pct(share(unsure, d => top2(d) > 0.9))} of unsure cases, nearly all its doubt is between exactly <b>two</b> classes, and Spiral is part of most of these pairs. The bridges are genuinely in-between galaxies: on the Spiral ↔ Edge-on bridge, true spirals and true edge-on disks are equally flat, the volunteers themselves were split on “edge-on” (27%, against 0–5% elsewhere on the map), and the model's mistakes go both ways equally. These are tilted disks. In the hidden groups, the "disturbed" galaxies look like the real spirals around them in colour, size and shape; too few of them have volunteer votes to say why the model is wrong there (7 mistakes, and for 5 of them the votes back the label). We rebuilt the map from three other random starting layouts: the same bridges and the hidden group came back, and crowdedness still made no difference, although the exact number of regions changed (38–46). Being in a sparse or crowded part of the map does <b>not</b> predict mistakes (${pct(MD.density.sparsest)} vs ${pct(MD.density.densest)} wrong): about half the mistakes (${pct(share(wrong, d => d.conf < 0.8))}) are unsure ones on bridges, the other half are confident ones inside islands.`;
+  $("m-say").innerHTML = `This map places every galaxy by the model's answer: galaxies close together got similar answers. Most of the map is made of <b>dense islands where the model is completely sure and almost never wrong</b>. The mistakes (orange) sit in two kinds of places: on <b>bridges between two islands</b>, where the model is torn between two classes (${nums("bridge")}), and in <b>groups hidden inside the Spiral island</b>, where the model is sure but about a quarter of the galaxies are actually irregular (${nums("hidden")}).`;
+  $("m-note").innerHTML = `<b>What the map tells us.</b> When the model is unsure, it is almost never confused in general: in ${pct(share(unsure, d => top2(d) > 0.9))} of unsure cases, nearly all its doubt is between exactly <b>two</b> classes, and Spiral is part of most of these pairs. The bridges are genuinely in-between galaxies: on the Spiral ↔ Edge-on bridge, true spirals and true edge-on disks are equally flat, the volunteers themselves were split on “edge-on” (27%, against 0–5% elsewhere on the map), and the model's mistakes go both ways equally. These are tilted disks. In the hidden groups, the "irregular" galaxies look like the real spirals around them in colour, size and shape; too few of them have volunteer votes to say why the model is wrong there (7 mistakes, and for 5 of them the votes back the label). We rebuilt the map from three other random starting layouts: the same bridges and the hidden group came back, and crowdedness still made no difference, although the exact number of regions changed (38–46). Being in a sparse or crowded part of the map does <b>not</b> predict mistakes (${pct(MD.density.sparsest)} vs ${pct(MD.density.densest)} wrong): about half the mistakes (${pct(share(wrong, d => d.conf < 0.8))}) are unsure ones on bridges, the other half are confident ones inside islands.`;
 }
 
 // ---------- 7: what does not matter ----------
@@ -306,7 +306,7 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
   const round = T2.filter(t => t.d.l10 === 2), sp = of(T2, 0), mer = of(T2, 4);
   const z = VAL.filter(d => d.q[0] != null).sort((a, b) => a.q[0] - b.q[0]), f5 = Math.round(z.length / 5);
   const rows = [
-    ["Colour", "Red disturbed galaxies made bluer · called Elliptical", share(red, t => t.original === 1), share(red, t => t.bluer === 1)],
+    ["Colour", "Red irregular galaxies made bluer · called Elliptical", share(red, t => t.original === 1), share(red, t => t.bluer === 1)],
     ["Shape", "Round ellipticals squashed flat · called Edge-on", share(round, t => t.original === 2), share(round, t => t.squash === 2)],
     ["Neighbours", "Small galaxy added next to spirals · called Merger", share(sp, t => t.original === 4), share(sp, t => t.add_neighbour === 4)],
     ["Surroundings", "Surroundings removed around mergers · still Merger", share(mer, t => t.original === 4), share(mer, t => t.no_context === 4)],
