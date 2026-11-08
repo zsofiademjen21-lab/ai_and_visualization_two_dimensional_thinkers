@@ -48,9 +48,9 @@ Rotating an image or moving the galaxy off-centre doesn't change what the galaxy
 | moving off-centre | **17%** | 4% |
 | blurring | **38%** | 8% |
 
-The model's decisions for disturbed galaxies sit close to a tipping point.
+The model's decisions for disturbed galaxies sit close to a tipping point: the galaxies whose answer flips when rotated were already unsure (median confidence 70%, against 94% for those whose answer stays the same).
 
-### Takeaway 4: The model memorised the rare classes instead of learning them
+### Takeaway 4: The rarest classes do much worse on new images than on training images
 
 ![Takeaway 4](figures/takeaway_4.png)
 
@@ -58,7 +58,7 @@ For most types, accuracy on new images is close to accuracy on training images (
 - disturbed galaxies drop from **74% to 56%**;
 - cigar-shaped ellipticals drop from **97% to 85%**.
 
-The model remembered the few examples it saw rather than learning what these galaxies look like. Even on its own training images it gets 26% of disturbed galaxies wrong. The volunteers' votes (see Takeaway 5) explain why: many disturbed galaxies are spirals that are also disturbed, so two answers fit.
+This looks like memorisation: the model seems to have remembered the few examples it saw rather than learned what these galaxies look like. Their rarity may be one reason, but proving that would require retraining the model, which is outside Phase I. Even on its own training images it gets 26% of disturbed galaxies wrong. The volunteers' votes (see Takeaway 5) explain why: many disturbed galaxies are spirals that are also disturbed, so two answers fit.
 
 ### Takeaway 5: The model is often very sure even when it is wrong
 
@@ -83,16 +83,16 @@ An earlier visual impression, that about 16 of the 40 most confident mistakes lo
 
 ![Takeaway 6](figures/takeaway_6.png)
 
-We clustered the map of the model's answers (HDBSCAN, 39 regions). Most of the map is **dense islands where the model is sure and never wrong** (25 regions with no mistakes at all). The mistakes sit in two kinds of places.
+We clustered the map of the model's answers (HDBSCAN, about 40 regions). Most of the map is **dense islands where the model is sure and almost never wrong**. The mistakes sit in two kinds of places.
 
 1. **Bridges between two classes,** where the model hesitates between exactly two answers.
    - When the model is unsure, in **82%** of cases almost all its doubt is split between just two classes, and Spiral is part of most of these pairs.
-   - The bridges contain genuinely in-between galaxies. On the Spiral ↔ Edge-on bridge, true spirals and true edge-on disks are equally flat (tilted disks), and the mistakes go both ways equally.
+   - The bridges contain genuinely in-between galaxies. On the Spiral ↔ Edge-on bridge, true spirals and true edge-on disks are equally flat, the volunteers themselves were split on "edge-on" (27%, against 0–5% elsewhere on the map), and the mistakes go both ways equally. These are tilted disks.
 2. **Groups hidden inside the Spiral island,** where the model is confident but about a quarter of the galaxies are labelled disturbed.
-   - These "disturbed" galaxies look like the spirals around them in colour, size and roundness. The volunteers' votes show that many are disturbed spirals, where both answers fit.
+   - These "disturbed" galaxies look like the spirals around them in colour, size and roundness. Too few have volunteer votes to say why the model is wrong here (7 mistakes; for 5 of them the votes back the label).
    - The mix splits into separate sub-groups that behave differently: the same share of disturbed galaxies, but different confidence (69%, 83% and 90%).
 
-**Density does not explain the errors.** The sparsest and the densest fifth of the map have the same error rate (9%). About half the mistakes are unsure ones on bridges; the other half are confident ones inside islands.
+**Density does not explain the errors.** The sparsest and the densest fifth of the map have about the same error rate (8–9%). About half the mistakes are unsure ones on bridges; the other half are confident ones inside islands.
 
 ### Takeaway 7: What does not confuse the model
 
@@ -108,12 +108,12 @@ Several factors looked like they might matter, so we tested them directly. None 
 | Surroundings removed around mergers | still called Merger | 91% | 90% |
 | Distance, nearest vs farthest fifth (real images) | answered correctly | 93% | 92% |
 
-Colour is the important case. In the real images, red disturbed galaxies *are* called Elliptical far more often than blue ones (33% vs 2%), so it looked as if the model judges by colour. The test shows it doesn't; red disturbed galaxies are probably just smoother in shape. This shows why we tested patterns rather than only observing them.
+Colour is the important case. In the real images, red disturbed galaxies *are* called Elliptical far more often than blue ones (33% vs 2%), so it looked as if the model judges by colour. The test shows it doesn't. The volunteers do call red disturbed galaxies "smooth" more often than blue ones (37% vs 28%), so a smoother shape, not the colour itself, is the likely reason. This shows why we tested patterns rather than only observing them.
 
 ## 3. Confidence and limitations
 
-- **High confidence:** takeaways 1–4 and 7. Each rests on hundreds of images, holds on both the training and the validation data, and in most cases the cause was tested by editing images.
-- **Medium confidence:** takeaway 6. The map layout and the regions depend on t-SNE and the clustering settings. The error rates inside the regions are measured directly.
+- **High confidence:** the measured effects in takeaways 1–4 and 7. Two explanations are interpretations rather than tested results: that rarity causes the weak rare classes, and that the gap in takeaway 4 is memorisation. Each rests on hundreds of images, holds on both the training and the validation data, and in most cases the cause was tested by editing images.
+- **Medium confidence:** takeaway 6. We rebuilt the map from three other random starting layouts: the same bridges, the hidden group in the Spiral region and the density result came back each time, but the exact number of regions changed (38–46), so we report the structure, not the counts.
 - **Checked with volunteer votes:** wrong labels explain only about 10% of the mistakes. This rests on the 45% of galaxies with public votes and on an approximate mapping from the Galaxy Zoo questions to our five classes (see `src/volunteer_votes.py`).
 - **Measurements are rough proxies.** Size, roundness and colour are measured with simple image statistics, and atmospheric blur makes small galaxies look rounder.
 - **Edited images can contain artefacts.** We checked every edit visually before running the tests, and fixed two artificial-looking edits.

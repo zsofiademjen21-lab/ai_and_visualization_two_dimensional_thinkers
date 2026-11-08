@@ -108,7 +108,7 @@ svg text { fill: var(--ink-2); font-size: 14px; }
 
   <section class="card">
     <div class="num">Takeaway 4</div>
-    <h2>The model memorised the rare classes instead of learning them</h2>
+    <h2>The rarest classes do much worse on new images than on training images</h2>
     <p class="say" id="t4-say"></p>
     <div id="t4-chart"></div>
   </section>
@@ -140,7 +140,7 @@ svg text { fill: var(--ink-2); font-size: 14px; }
     <h2>What does <i>not</i> confuse the model</h2>
     <p class="say">Some things looked like they might matter, so we changed them on purpose. The answers barely moved.</p>
     <div class="nope" id="t6"></div>
-    <p class="note">Colour is the important one: in the real images, red disturbed galaxies <i>are</i> called Elliptical far more often than blue ones, so it looked like the model judges by colour. The test shows it doesn't. Red disturbed galaxies are probably just smoother in shape.</p>
+    <p class="note">Colour is the important one: in the real images, red disturbed galaxies <i>are</i> called Elliptical far more often than blue ones, so it looked like the model judges by colour. The test shows it doesn't. The volunteers do call red disturbed galaxies “smooth” more often than blue ones (37% vs 28%), so a smoother shape, not the colour itself, is the likely reason.</p>
   </section>
 
   <p class="foot">Data: Galaxy10 DECals validation images (not used for training). "Tested by editing images": we changed one thing in the images (size, blur, colour, shape, rotation, position or neighbours) and ran the model again on the same galaxies (705 and 1,115 galaxies in two tests). Numbers are calculated live from the model's predictions. For details, open explorer.html.</p>
@@ -235,7 +235,7 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
     { label: "Blurred · spirals & ellipticals", v: ch(others2, "blur") },
     { label: "Blurred · disturbed", v: ch(of(T2, 3), "blur"), hi: true },
   ], 0.5);
-  $("t3-say").innerHTML = `A galaxy is still the same galaxy when the picture is rotated or moved, and the model was even trained on rotated images. Still, these small changes <b>flip the answer for many disturbed galaxies</b>: ${pct(ch(of(T1, 3), "rot90"))} after rotating and ${pct(ch(of(T2, 3), "shift"))} after moving, far more than for spirals and ellipticals (chart: share of answers that change). For disturbed galaxies the model is unsure and close to a tipping point.`;
+  $("t3-say").innerHTML = `A galaxy is still the same galaxy when the picture is rotated or moved, and the model was even trained on rotated images. Still, these small changes <b>flip the answer for many disturbed galaxies</b>: ${pct(ch(of(T1, 3), "rot90"))} after rotating and ${pct(ch(of(T2, 3), "shift"))} after moving, far more than for spirals and ellipticals (chart: share of answers that change). For disturbed galaxies the model is unsure and close to a tipping point: the ones whose answer flips when rotated were already unsure (median confidence 70%, against 94% for those that stay the same).`;
   pairs("t3-ex", "rotate", "original", "rotated 90°");
 }
 
@@ -251,7 +251,7 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
     { label: "All other types · training images", v: acc(TR, common) },
     { label: "All other types · new images", v: acc(VAL, common) },
   ]);
-  $("t4-say").innerHTML = `For most galaxy types, the model does about as well on new images as on the images it was trained on. For the two <b>rarest</b> types it doesn't: disturbed galaxies drop from <b>${pct(acc(TR, d => d.l10 === 0))} to ${pct(acc(VAL, d => d.l10 === 0))}</b>, cigar-shaped ellipticals from ${pct(acc(TR, d => d.l10 === 4))} to ${pct(acc(VAL, d => d.l10 === 4))} (chart: share correct). It remembered the few examples it saw instead of learning what these galaxies look like. And even on its training images it gets ${pct(1 - acc(TR, d => d.l10 === 0))} of disturbed galaxies wrong, and the volunteers' votes show why: many of them are spirals that are also disturbed, so two answers fit.`;
+  $("t4-say").innerHTML = `For most galaxy types, the model does about as well on new images as on the images it was trained on. For the two <b>rarest</b> types it doesn't: disturbed galaxies drop from <b>${pct(acc(TR, d => d.l10 === 0))} to ${pct(acc(VAL, d => d.l10 === 0))}</b>, cigar-shaped ellipticals from ${pct(acc(TR, d => d.l10 === 4))} to ${pct(acc(VAL, d => d.l10 === 4))} (chart: share correct). This looks like memorisation: the model seems to have remembered the few examples it saw rather than learned what these galaxies look like. Their rarity may be one reason, but we can't prove that without retraining the model. Even on its training images it gets ${pct(1 - acc(TR, d => d.l10 === 0))} of disturbed galaxies wrong, and the volunteers' votes show why: many of them are spirals that are also disturbed, so two answers fit.`;
 }
 
 // ---------- 5: confident mistakes ----------
@@ -295,7 +295,7 @@ $("lede").textContent = `We tested the galaxy classifier on ${VAL.length.toLocal
   bars("m-pairs", top.map(([k, n], i) => ({ label: k.replace("Irregular", "Disturbed"), v: n / unsure.length, hi: k.includes("Spiral") })), 0.3);
   const wrong = pts.filter(d => !ok(d));
   $("m-say").innerHTML = `This map places every galaxy by the model's answer: galaxies close together got similar answers. Most of the map is made of <b>dense islands where the model is completely sure and almost never wrong</b>. The mistakes (orange) sit in two kinds of places: on <b>bridges between two islands</b>, where the model is torn between two classes (${nums("bridge")}), and in <b>groups hidden inside the Spiral island</b>, where the model is sure but about a quarter of the galaxies are actually disturbed (${nums("hidden")}).`;
-  $("m-note").innerHTML = `<b>What the map tells us.</b> When the model is unsure, it is almost never confused in general: in ${pct(share(unsure, d => top2(d) > 0.9))} of unsure cases, nearly all its doubt is between exactly <b>two</b> classes, and Spiral is part of most of these pairs. The bridges are genuinely in-between galaxies: on the Spiral ↔ Edge-on bridge, true spirals and true edge-on disks are equally flat (they are tilted disks), and the model's mistakes go both ways equally. In the hidden groups, the "disturbed" galaxies look like the real spirals around them in colour, size and shape, and the volunteers' votes show many of them are disturbed spirals, where both answers fit. Being in a sparse or crowded part of the map does <b>not</b> predict mistakes (${pct(MD.density.sparsest)} vs ${pct(MD.density.densest)} wrong): about half the mistakes (${pct(share(wrong, d => d.conf < 0.8))}) are unsure ones on bridges, the other half are confident ones inside islands.`;
+  $("m-note").innerHTML = `<b>What the map tells us.</b> When the model is unsure, it is almost never confused in general: in ${pct(share(unsure, d => top2(d) > 0.9))} of unsure cases, nearly all its doubt is between exactly <b>two</b> classes, and Spiral is part of most of these pairs. The bridges are genuinely in-between galaxies: on the Spiral ↔ Edge-on bridge, true spirals and true edge-on disks are equally flat, the volunteers themselves were split on “edge-on” (27%, against 0–5% elsewhere on the map), and the model's mistakes go both ways equally. These are tilted disks. In the hidden groups, the "disturbed" galaxies look like the real spirals around them in colour, size and shape; too few of them have volunteer votes to say why the model is wrong there (7 mistakes, and for 5 of them the votes back the label). We rebuilt the map from three other random starting layouts: the same bridges and the hidden group came back, and crowdedness still made no difference, although the exact number of regions changed (38–46). Being in a sparse or crowded part of the map does <b>not</b> predict mistakes (${pct(MD.density.sparsest)} vs ${pct(MD.density.densest)} wrong): about half the mistakes (${pct(share(wrong, d => d.conf < 0.8))}) are unsure ones on bridges, the other half are confident ones inside islands.`;
 }
 
 // ---------- 7: what does not matter ----------

@@ -256,6 +256,24 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 
 ---
 
+## 15. Testing the remaining claims
+
+**Prompt:** "is there any more untested claim?"
+
+**What Claude did:** It went through every claim in the report and the findings page, and tested the ones that could be tested with data we already had:
+- **"Disturbed galaxies are close to a tipping point"** is supported. The ones whose answer flips when rotated were already unsure (median confidence 70% vs 94%).
+- **"The Spiral ↔ Edge-on bridge contains tilted disks"** is supported. The volunteers were split on "edge-on" there too (27%, against 0–5% elsewhere).
+- **"Red disturbed galaxies are just smoother"** is partly supported. The volunteers call them "smooth" more often (37% vs 28%), but our roundness measure is the same.
+- **"The groups hidden among spirals are disturbed spirals"** is not supported. Claude had carried the overall vote result over to these regions without checking them. Only 7 mistakes there have votes, and for 5 of them the votes back the label.
+- **The map** was rebuilt from three other random starting layouts. The same bridges, the hidden group and the density result came back each time, but the number of regions changed (38–46), so "25 regions with no mistakes" was not a robust number.
+- **Two claims can't be tested in Phase I and are now worded as interpretations:** that rarity causes the weak rare classes, and that the gap is "memorisation". Takeaway 4 was renamed to "The rarest classes do much worse on new images than on training images".
+
+Claude corrected the findings page, report, reflection, slides and figures.
+
+**My decision:** Accepted. Every claim is now either measured, tested, or clearly marked as an interpretation.
+
+---
+
 ## Which AI suggestions we accepted, changed or rejected
 
 | AI suggestion | Decision | Why |
@@ -272,6 +290,8 @@ Then it started a second image-editing test (`ai_aided/src/perturbation_test2.py
 | "Many confident mistakes are wrong labels" (Claude looking at the images) | Rejected after checking | The volunteers' own votes back the model in only 10% of mistakes. Most were disturbed spirals, where both answers fit. |
 | Cluster analysis of the map | Accepted | It shows where the mistakes are and why. |
 | Judging the 40 most confident mistakes by hand (label-check page) | Not used | As a non-expert my judgement would have been weak evidence. We used the volunteers' own votes instead. |
+| "The groups hidden among spirals on the map are disturbed spirals" | Rejected after checking | Claude generalised the overall vote result to these regions; the few votes there mostly back the label. |
+| "25 regions with no mistakes" | Refined | The count changed with the map layout (16–25); we now report the structure, not the count. |
 
 ## How the AI changed the direction of our analysis
 
@@ -290,6 +310,7 @@ The section numbers point to the log entries above.
 - Generated code can contain small bugs even when it looks fine (§2).
 - Numbers can look reasonable but come from a wrong calculation. The first roundness values made edge-on disks almost as round as ellipticals (§4).
 - The AI's first default settings can give useless results. The first clustering found only 2 clusters (§11).
+- Exact counts can depend on random choices. The number of map regions with no mistakes changed from 16 to 25 with the map's random starting layout (§15).
 
 **Following the task**
 - The AI fills gaps in the task with "standard practice", even when that breaks the task rules. It used the model's internal features, which belongs to Phase II (§3).
@@ -299,6 +320,7 @@ The section numbers point to the log entries above.
 - A pattern in real data can look like a cause when it isn't. Red disturbed galaxies were called Elliptical more often, but changing only the colour changed nothing (§7).
 - Results from different kinds of evidence can get mixed up. A result from the real images was shown in the "tested by editing images" card (§10).
 - Page text can contain hard-coded values that no longer match the data, such as region numbers written by hand (§11).
+- A result can be carried over to a subgroup where it was never checked. "The hidden groups are disturbed spirals" came from the overall vote result, and the few votes in those regions mostly back the label (§15).
 - The first version of the output is often correct but too detailed and full of jargon for the audience (§6, §12).
 
 **Experiments and images**

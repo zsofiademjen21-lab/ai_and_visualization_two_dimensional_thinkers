@@ -21,7 +21,7 @@ Tool: Claude Code. Full record: [ai-interactions/ai-use-log.md](ai-interactions/
 
 ## Did AI change the breadth or depth of our analysis?
 
-Both. **Breadth:** we tested many more hypotheses than we could have by hand: six image properties, ten kinds of image edits, a cluster analysis and a comparison with the volunteers' votes. **Depth:** the AI suggested testing patterns by editing the images. This let us go past "we see a pattern" to "this is the cause". For example, it showed that colour is *not* the reason for a mistake, even though the data suggested it was.
+Both. **Breadth:** we tested many more hypotheses than we could have by hand: six image properties, ten kinds of image edits, a cluster analysis and a comparison with the volunteers' votes. **Depth:** the AI suggested testing patterns by editing the images. This let us go past "we see a pattern" to "this is the cause". For example, it showed that colour is not the reason for a mistake, even though the data suggested it was.
 
 ## Did it make us faster, or did checking it cost extra work?
 
@@ -35,8 +35,8 @@ Checking is quicker than building, but it is real work. It only works if you kno
 
 ## How confident are we in our conclusions, and why?
 
-- **High confidence:** the disturbed-galaxy blind spot, loss of detail causing "Elliptical" mistakes, the fragility of disturbed predictions, and the memorisation of rare classes. These are based on hundreds of images, hold on both the training and validation data, and the causes were tested by editing images.
-- **Medium confidence:** the map regions. They depend on the t-SNE layout and clustering settings, although the error patterns inside them are measured directly.
+- **High confidence:** the disturbed-galaxy blind spot, loss of detail causing "Elliptical" mistakes, the fragility of disturbed predictions, and the much weaker results for the rare classes on new images. These are based on hundreds of images, hold on both the training and validation data, and the causes were tested by editing images where possible. That rarity causes the weak rare classes, and that the gap is memorisation, are interpretations we could not test in Phase I.
+- **Medium confidence:** the map regions. The same bridges and hidden group came back when we rebuilt the map from three other random starts, but the exact number of regions changed.
 - **Corrected by data:** the AI's visual impression suggested that many confident mistakes were wrong labels. The volunteers' own votes showed this explains only about 1 in 10 mistakes; most "disturbed" galaxies called Spiral are disturbed spirals, where both answers fit. A good example of why an AI's visual judgement needs checking against real data.
 
 ## Strengths and limitations of AI assistance
