@@ -26,18 +26,7 @@ The rest of this README describes how to reproduce the Claude part.
 
 ## Setup
 
-```bash
-pip install torch torchvision timm h5py pandas scikit-learn pillow huggingface_hub
-```
-
-The `zoobot` package is **not** needed. `claude/src/model.py` rebuilds the network with plain `timm` and loads the checkpoint with `weights_only=True`.
-
-The dataset and the checkpoint are shared with the whole group, so they live at the **repository root**, not in this folder. Both are gitignored.
-- Download the data (2.7 GB) into `data/` at the repo root:
-  ```bash
-  curl -L -o data/Galaxy10_DECals.h5 https://zenodo.org/records/10845026/files/Galaxy10_DECals.h5
-  ```
-- The checkpoint (180 MB) downloads automatically into `models/` at the repo root the first time you run the code.
+Install the packages and download the dataset as described in the [main README](../README.md#reproducing-the-results). The dataset and the checkpoint live at the repository root, not in this folder.
 
 ## Pipeline
 
