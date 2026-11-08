@@ -26,7 +26,7 @@ import torch
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
-from ai_aided.claude.figures.src.model import ROOT, REPO, CLASS_NAMES, TRANSFORM, load_model  # noqa: E402
+from model import ROOT, REPO, CLASS_NAMES, TRANSFORM, load_model  # noqa: E402
 
 N = 256
 

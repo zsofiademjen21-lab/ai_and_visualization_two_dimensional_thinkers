@@ -19,8 +19,8 @@ import pandas as pd
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
-from ai_aided.claude.figures.src.model import ROOT, REPO, CLASS_NAMES  # noqa: E402
-from ai_aided.claude.figures.src.perturbation_test import KINDS, perturb  # noqa: E402
+from model import ROOT, REPO, CLASS_NAMES  # noqa: E402
+from perturbation_test import KINDS, perturb  # noqa: E402
 
 
 def b64(im):
@@ -61,7 +61,7 @@ def main():
                        "pred_before": int(w.at[i, "original"]), "pred_after": int(w.at[i, kind])})
 
     # second test (perturbation_test2.py): blur / squash / shift / no_context / add_neighbour
-    from ai_aided.claude.figures.src.perturbation_test2 import KINDS as KINDS2, perturb as perturb2
+    from perturbation_test2 import KINDS as KINDS2, perturb as perturb2
     p2 = pd.read_csv(ROOT / "results" / "perturbations2.csv")
     w2 = p2.pivot(index="idx", columns="perturbation", values="pred").join(
         p2.drop_duplicates("idx").set_index("idx")[["label5"]])

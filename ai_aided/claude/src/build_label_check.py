@@ -18,7 +18,7 @@ import pandas as pd
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
-from ai_aided.claude.figures.src.model import ROOT, REPO, CLASS_NAMES, GALAXY10_NAMES  # noqa: E402
+from model import ROOT, REPO, CLASS_NAMES, GALAXY10_NAMES  # noqa: E402
 
 N_SHOW = 40
 

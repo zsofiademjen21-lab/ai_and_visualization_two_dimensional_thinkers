@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
-from ai_aided.claude.figures.src.model import ROOT, REPO  # noqa: E402
+from model import ROOT, REPO  # noqa: E402
 
 N = 256
 YY, XX = np.mgrid[:N, :N].astype(np.float32)

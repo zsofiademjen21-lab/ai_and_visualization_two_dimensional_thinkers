@@ -20,7 +20,7 @@ from PIL import Image
 from sklearn.manifold import TSNE
 
 sys.path.insert(0, str(Path(__file__).parent))
-from ai_aided.claude.figures.src.model import ROOT, REPO, CLASS_NAMES, GALAXY10_NAMES, GALAXY10_TO_5  # noqa: E402
+from model import ROOT, REPO, CLASS_NAMES, GALAXY10_NAMES, GALAXY10_TO_5  # noqa: E402
 
 RES, VIS = ROOT / "results", ROOT / "vis"
 THUMB = 64
