@@ -4,7 +4,7 @@
 
 **Model.** [zev-walker/astrovision-advanced](https://huggingface.co/zev-walker/astrovision-advanced) is a Zoobot (ConvNeXt-Nano) image classifier. It was fine-tuned on Galaxy10 DECals and sorts galaxy images into five classes: Spiral, Elliptical, Edge-on Disk, Irregular (disturbed galaxies) and Merger. The author reports a single number: 92.9% validation accuracy.
 
-**Data.** We used the established Galaxy10 DECals benchmark (17,736 images). We reproduced the author's exact train/validation split (random 20%, seed 42). All findings are based on the **3,547 validation images**, which the model was not trained on; the 14,189 training images serve only as a comparison. Our reproduction gives exactly **92.9%** accuracy, which confirms that our setup matches the author's.
+**Data.** We used the established Galaxy10 DECals benchmark (17,736 images). We reproduced the author's exact train/validation split (random 20%, seed 42). The findings are based on the **3,547 validation images**, which the model was not trained on. The 14,189 training images serve as a comparison, and are also included in the volunteer-vote check (Takeaway 5) to have more mistakes with votes. Our reproduction gives exactly **92.9%** accuracy, which confirms that our setup matches the author's.
 
 **Black-box approach.** We only used inputs and outputs:
 - the model's predicted class probabilities;
@@ -23,7 +23,7 @@
 
 ![Takeaway 1](figures/takeaway_1.png)
 
-Only **56%** of disturbed galaxies are recognised, compared with **95%** for all other types. The errors are not random: 24% are called Spiral and 18% Elliptical. Disturbed is also one of the rarest classes in the training data (876 images, compared with up to 2,121 for other types).
+Only **56%** of disturbed galaxies are recognised, compared with **95%** for all other types. The errors are not random: 24% are called Spiral and 18% Elliptical. Disturbed is also one of the rarest classes in the training data (876 training images, compared with 1,443 to 5,200 for the other four classes).
 
 ### Takeaway 2: When a galaxy loses detail, the model calls it an elliptical
 
@@ -66,7 +66,7 @@ The model remembered the few examples it saw rather than learning what these gal
 
 Averaged over all predictions, the model's confidence matches its accuracy well: the average calibration gap is 2%. But **86 of its 252 mistakes (34%)** are made with at least 90% confidence, so confidence cannot be used to catch them. 39 of these 86 are disturbed galaxies.
 
-**Are these mistakes really wrong labels?** Galaxy10's labels come from Galaxy Zoo volunteer votes, and the vote counts are public for about 45% of the galaxies (Galaxy Zoo DECaLS, Walmsley et al. 2022). For each of the model's 202 mistakes that have votes, we compared how many volunteers supported the label with how many supported the model's answer:
+**Are these mistakes really wrong labels?** Galaxy10's labels come from Galaxy Zoo volunteer votes, and the vote counts are public for about 45% of the galaxies (Galaxy Zoo DECaLS, Walmsley et al. 2022). For each of the model's 202 mistakes that have votes (82 on validation and 120 on training images), we compared how many volunteers supported the label with how many supported the model's answer:
 
 | Volunteers' verdict | Share of mistakes |
 |---|---|
