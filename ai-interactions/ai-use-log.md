@@ -46,14 +46,14 @@ This means we can investigate the model's behavior without first correcting an o
 It generated 6 images from the original image: center crop, grayscale, reduced resolution, lower contrast, mild blur, asked me to classify the images with the model and upload the results.
 	
 **my decision:** I agreed and uploaded the results:
-| Image                    | Predicted Class   | Confidence | Merger Probability |
-|:-------------------------|:------------------|-----------:|-------------------:|
-| 00_original              | Irregular galaxy  |     97,40% |              0,04% |
-| 01_center_crop_72pct      | Spiral galaxy     |     50,99% |              3,95% |
-| 02_grayscale             | Irregular galaxy  |     97,06% |              0,06% |
-| 03_downsampled_upscaled  | Irregular galaxy  |     97,29% |              0,04% |
-| 04_lower_contrast         | Irregular galaxy  |     98,10% |              0,05% |
-| 05_mild_blur              | Irregular galaxy  |     97,27% |              0,04% |
+| Image | Predicted Class | Confidence | Merger Probability |
+|:------|:----------------|-----------:|-------------------:|
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/00_original.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/00_original.jpg) | Irregular galaxy | 97,40% | 0,04% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/01_center_crop_72pct.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/01_center_crop_72pct.jpg) | Spiral galaxy | 50,99% | 3,95% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/02_grayscale.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/02_grayscale.jpg) | Irregular galaxy | 97,06% | 0,06% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/03_downsampled_upscaled.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/03_downsampled_upscaled.jpg) | Irregular galaxy | 97,29% | 0,04% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/04_lower_contrast.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/04_lower_contrast.jpg) | Irregular galaxy | 98,10% | 0,05% |
+| [<img src="../ai_aided/chatgpt/figures/black-box%20variants/05_mild_blur.jpg" width="100">](../ai_aided/chatgpt/figures/black-box%20variants/05_mild_blur.jpg) | Irregular galaxy | 97,27% | 0,04% |
 	
 **ChatGPT:** Observations:
 
