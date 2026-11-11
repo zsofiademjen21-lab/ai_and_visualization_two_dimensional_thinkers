@@ -1,71 +1,106 @@
-# Phase I: How does the model behave?
+# Phase I – Human-only pair: How does AstroVision behave?
 
-> We test the model on galaxy images it has never seen, to understand what it does well
-> and where it makes mistakes. We look for patterns in its predictions and investigate
-> which factors affect its results.
+In this phase we treated AstroVision Advanced as a black box. We only looked at what goes in
+(a galaxy image) and what comes out (a probability for each of the five classes: Spiral,
+Elliptical, Edge-on, Irregular and Merger), and tried to find out where the model does well,
+where it fails, and why.
 
-The model is treated as a **black box**: we only look at the input image and the
-output (5 class probabilities), never inside the network.
+All code and figures are in [`Phase1_Human_Only.ipynb`](Phase1_Human_Only.ipynb). The figures
+are also saved in `figures/`.
 
----
+## Setup
 
-## 1. How to run it
+The model was fine-tuned on Galaxy10 DECals with a random 80/20 split. We rebuilt exactly the same
+split (same seed as in `train.py`), so all our results are on the 3,547 validation images the
+model never saw during training. We get an accuracy of 92.9%, the same number the model's authors
+report, which told us the setup was right.
 
-Everything is in one notebook: **`Phase1_Human_Only.ipynb`**. Open it in VS Code (select the
-`venv` Python as kernel) or in the browser, and run all cells from top to bottom:
+For every image we stored the prediction, the confidence (the probability of the predicted class)
+and four simple properties of the image: the redshift (how far away the galaxy is), the size of the
+galaxy in the image, the brightness of its centre, and how red it is (mean red channel minus mean
+blue channel).
+
+## One class is the problem
+
+The overall accuracy hides a very uneven picture (fig1). Four of the five classes are recognised
+91–98% of the time, but **Irregular galaxies only 56% of the time**. It is also the rarest class
+in the training data: 876 images, compared to 5,200 spirals.
+
+The confusion matrix (fig2) shows where these galaxies go: 49 of them are predicted as Spiral and
+36 as Elliptical. Together that is a third of all 252 mistakes. When we split the classes back into
+the ten original Galaxy10 subtypes (fig3), "Disturbed" is the only subtype that really stands out.
+The one smaller issue is Cigar Smooth ellipticals, which are sometimes taken for edge-on disks
+(9% of 53 images). That is understandable, since both look like a thin elongated shape.
+
+The confidence values (fig4) made this more interesting. For most classes, wrong predictions have
+clearly lower confidence than correct ones (median 0.79 vs 0.99), so the model "knows" when it is
+unsure. For Irregular galaxies this is not the case: the wrong predictions are about as confident
+as the correct ones. **The model is confidently wrong** on exactly the class it struggles with most.
+
+## What affects the results?
+
+Next we checked whether distance, size, brightness or colour make a difference (fig5). For the
+model as a whole they barely matter: every group lands between 92% and 95%. Irregular galaxies are
+the exception again. The closest ones are recognised 73% of the time, those at medium distance only
+39%. The bluest ones reach 68%, the reddest only 37%. With about 40 Irregular images per group these
+numbers are noisy, but the trend is clear enough to follow up.
+
+Looking at the actual images (section 5 of the notebook) gave us the most useful hint: many of the
+"Disturbed" galaxies that the model calls Elliptical simply look like smooth, round, reddish
+ellipticals.
+
+## Going deeper
+
+**Is it the model or the label?** The Galaxy10 labels come from Galaxy Zoo volunteers, so they are
+not perfect. To check this, all 91 wrongly predicted Irregular galaxies were labeled visually as
+"looks disturbed" or "looks normal", with the model's prediction hidden (fig6). Only 24 of the 91
+clearly look disturbed. The difference between the two big mistake types is striking:
+
+- Of the 36 galaxies predicted as **Elliptical**, only 2 look disturbed. The other 34 look like
+  ordinary ellipticals, so for most of these "mistakes" the model's answer is at least as plausible
+  as the label.
+- Of the 49 predicted as **Spiral**, 18 look disturbed, so here we see a mix of debatable labels
+  and real model errors.
+- All 3 predicted as **Merger** show interacting galaxies, which is a reasonable confusion.
+
+**Colour or distance?** Far away galaxies also look redder, so we could not tell from fig5 which of
+the two actually matters. We split the Irregular galaxies into four groups: near/far and blue/red
+(fig8).
+
+| | blue | red |
+|---|---|---|
+| **near** | 70% correct, 3% called Elliptical (n=73) | 43% correct, 27% called Elliptical (n=30) |
+| **far** | 53% correct, 13% called Elliptical (n=30) | 47% correct, 31% called Elliptical (n=72) |
+
+Near and blue is the only group the model handles well. Red galaxies are called Elliptical almost
+equally often whether they are near or far, so **colour matters more than distance**. The model
+seems to have learned something like "red and smooth means Elliptical". The Spiral mistakes, on the
+other hand, happen in all four groups (20–30%), so colour and distance do not explain them.
+
+## Conclusion
+
+The model works well on four of five classes and is robust to distance, size, brightness and colour.
+Its weak spot is the Irregular class, which is rare in the training data and where the model is
+confidently wrong. A large part of these errors, especially the ones predicted as Elliptical, are
+galaxies that do not look disturbed at all, and their colour plays a big role. So the low Irregular
+accuracy is partly a problem with the labels and only partly a problem with the model.
+
+**Limitations.** There are only 205 Irregular galaxies in the validation set, so the group-level
+numbers are noisy. The visual labels are a single subjective judgement. Our image properties are
+simple: redness, for example, is measured over the whole image, including the sky and other objects.
+
+**Questions for Phase II.** For the Irregular galaxies that really do look disturbed but are still
+predicted as Spiral or Elliptical, what does the model look at? We expect saliency maps to show that
+it focuses on the bright core and the colour, and ignores the faint disturbed features such as tidal
+tails.
+
+## Running the notebook
 
 ```bash
 source venv/bin/activate
 jupyter notebook phase1/Phase1_Human_Only.ipynb
 ```
 
-Needs `data/Galaxy10_DECals.h5` and `model/zoobot_finetuned.ckpt` (both already downloaded),
-and Jupyter in the venv (`pip install notebook ipykernel`).
-
-## 2. What the notebook contains
-
-| Section | What it does |
-|---|---|
-| 1. Setup | Rebuilds the **validation set** from `train.py` (same seed 42 → same 3,547 images the model was *not* trained on), runs the model, and builds a table with, per image: true class, original Galaxy10 subtype, prediction, confidence, all 5 probabilities, plus 4 simple **image factors**. |
-| 2. Behaviour per class | fig1-fig3, most common mistakes |
-| 3. Confidence | fig4 |
-| 4. Image factors | fig5 |
-| 5. Looking at the images | the `examples_*` image grids |
-| 6. Going deeper | the labeling grid, fig6-fig9 |
-
-Every figure is also saved as PNG to `figures/` (for the slides), and the table to
-`results/predictions.csv` (one row per image, open it in Excel / pandas for your own questions).
-
-**Check that the setup is correct:** our accuracy is **92.9%**, exactly the number in the model's README. So we rebuilt the same validation set.
-
-### The 4 image factors (all computed on the raw 256×256 image)
-
-| Factor | How it's computed | Meaning |
-|---|---|---|
-| `redshift` | stored in the dataset | how far away the galaxy is (bigger = farther) |
-| `size` | fraction of pixels brighter than 60/255 (sky ≈ 35) | how much of the image the galaxy covers |
-| `center_brightness` | mean brightness of the central 32×32 pixels | how bright the galaxy core is |
-| `redness` | mean red channel − mean blue channel | > 0 = redder (old stars), < 0 = bluer (young stars) |
-
-## 3. The figures and what we found (sections 2-5)
-
-| Figure | Question it answers | What it shows |
-|---|---|---|
-| `fig1_class_counts_and_accuracy` | Are rare classes predicted worse? | **Irregular** is the rarest class (876 training images vs 5,200 Spiral) and the worst by far: **56% accuracy**. All others are 91-98%. |
-| `fig2_confusion_matrix` | What gets confused with what? | Most errors are *Irregular → Spiral* (49) and *Irregular → Elliptical* (36). |
-| `fig3_subtypes_vs_prediction` | Which original subtype causes errors? | "Disturbed" is the only weak subtype. **Cigar Smooth** ellipticals (only 53 images) are mistaken for Edge-on 9% of the time. |
-| `fig4_confidence_correct_vs_wrong` | Does the model know when it's wrong? | Mostly yes for 4 classes (errors have lower confidence). But for **Irregular, the errors are just as confident as the correct predictions**: the model is *confidently wrong*. |
-| `fig5_accuracy_vs_factors` | Do distance / size / brightness / colour matter? | **Overall: hardly** (all groups ~92-95%). **But Irregular depends strongly on them:** 73% correct for the closest galaxies vs 39% at medium distance; 68% for the bluest vs 37% for the reddest. ⚠️ Only ~41 Irregular images per group, so this is noisy. |
-| `examples_*` | What do the mistakes look like? | Many "Disturbed" galaxies predicted *Elliptical* **look smooth and elliptical to the human eye too**. |
-
-## 4. Going deeper (section 6)
-
-| Figure | Question | What it shows |
-|---|---|---|
-| `labeling_grid_irregular` + `fig6_irregular_labels` | **Is it the model or the label?** | All 91 wrong Irregular images were labeled by eye, with the prediction hidden. Only **24 of 91** clearly look disturbed. Of the 36 predicted *Elliptical*, only **2** look disturbed; the other 34 look like ordinary ellipticals. Of the 49 predicted *Spiral*, 18 look disturbed. All 3 predicted *Merger* look like interacting systems. So **most "Elliptical" mistakes are really ambiguous labels**, while the "Spiral" mistakes are a mix of label ambiguity and real model errors. |
-| `fig7_irregular_redshift_vs_redness` + `fig8_irregular_distance_and_colour_groups` | **Colour or distance?** | **Colour matters more than distance for the "Elliptical" mistakes.** Near + blue Irregulars are almost never called Elliptical (3%), but near + red ones are (27%), as often as far + red ones (31%). Near + blue is the only group the model handles well (70% correct vs 43-53%). The "Spiral" mistakes (20-30%) happen in all four groups, so colour and distance don't explain them. |
-| `fig9_true_class_probability_and_rank` | **Was the right answer a close call?** | When the model gets an Irregular galaxy wrong, Irregular is its 2nd choice in 83% of cases, exactly the same as for the mistakes of all other classes. So the model doesn't ignore the Irregular class more than other classes; it just loses the close call more often. |
-
-**Hand-off to Phase II (when we open the black box):** for the misclassified Irregular galaxies that *do*
-look disturbed, does the model look at the colour and the bright core and ignore the faint disturbed
-features (tidal tails etc.)? Saliency maps can answer this.
+The notebook expects `data/Galaxy10_DECals.h5` and `model/zoobot_finetuned.ckpt` one folder above
+it. The first run reads the images from the `.h5` file once and caches them in
+`results/validation_images.npy` (about 700 MB, not in git).
