@@ -2,7 +2,7 @@
 
 Model: [zev-walker/astrovision-advanced](https://huggingface.co/zev-walker/astrovision-advanced)
 
-We used two AI LLMs (ChatGPT and Claude Code) to find the differences.
+We used two AI LLMs: ChatGPT and Claude Code
 
 ---
 
