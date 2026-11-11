@@ -37,11 +37,12 @@ The HTML pages are self-contained: they need no server and no downloads.
 | [`human_only/`](human_only/) | Human-only pair's Phase I work: notebook, figures (`figures/`) and results (`results/`) |
 | [`ai-interactions/ai-use-log.md`](ai-interactions/ai-use-log.md) | AI-use log: prompts, AI answers and what we checked or changed |
 | [`ai_reflection_midpoint.md`](ai_reflection_midpoint.md) | Midpoint reflection on working with AI, including a comparison with the human-only pair |
-| `data/`, `models/` | Shared dataset and model checkpoint (gitignored, see below) |
+| `data/` | Shared dataset (gitignored, see below) |
+| `models/` | Shared model checkpoint, stored with Git LFS (see below) |
 
 ## Reproducing the results
 
-The dataset (2.7 GB) and the checkpoint (180 MB) are shared by the whole group, so they live at the repository root and are not committed.
+The dataset (2.7 GB) and the checkpoint (172 MB) are shared by the whole group, so they live at the repository root. The dataset is not committed. The checkpoint is committed with [Git LFS](https://git-lfs.com/), so run `git lfs install` once before cloning (or `git lfs pull` after cloning) to get the real file instead of a small placeholder.
 
 ```bash
 pip install torch torchvision timm h5py pandas scikit-learn pillow huggingface_hub
@@ -49,7 +50,7 @@ mkdir -p data
 curl -L -o data/Galaxy10_DECals.h5 https://zenodo.org/records/10845026/files/Galaxy10_DECals.h5
 ```
 
-The checkpoint downloads into `models/` automatically on the first run. For the AI-aided code the `zoobot` package is **not** needed: `ai_aided/claude/src/model.py` rebuilds the network with plain `timm` and loads the checkpoint with `weights_only=True`.
+If `models/zoobot_finetuned.ckpt` is missing, the AI-aided code downloads it from Hugging Face on the first run. For the AI-aided code the `zoobot` package is **not** needed: `ai_aided/claude/src/model.py` rebuilds the network with plain `timm` and loads the checkpoint with `weights_only=True`.
 
 The full pipeline (inference, measurements, image-editing tests, data for the pages) is described step by step in [`ai_aided/README.md`](ai_aided/README.md#pipeline).
 
