@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AstroVision Model Explorer</title>
+<style>
+:root {
+  color-scheme: light;
+  --is-dark: 0;
+  --page: #f9f9f7; --surface-1: #fcfcfb; --surface-2: #f0efec;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+  --s1: #2a78d6; --s2: #eb6834;
+  --c0: #2a78d6; --c1: #eb6834; --c2: #1baf7a; --c3: #eda100; --c4: #e87ba4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark; --is-dark: 1;
+    --page: #0d0d0d; --surface-1: #1a1a19; --surface-2: #262624;
+    --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --s1: #3987e5; --s2: #d95926;
+    --c0: #3987e5; --c1: #d95926; --c2: #199e70; --c3: #c98500; --c4: #d55181;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark; --is-dark: 1;
+  --page: #0d0d0d; --surface-1: #1a1a19; --surface-2: #262624;
+  --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+  --s1: #3987e5; --s2: #d95926;
+  --c0: #3987e5; --c1: #d95926; --c2: #199e70; --c3: #c98500; --c4: #d55181;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 15px; margin: 0 0 2px; }
+.lede, .sub { color: var(--ink-2); margin: 0 0 12px; }
+.sub { font-size: 12.5px; }
+.filters { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 16px 0;
+  position: sticky; top: 0; z-index: 5; background: var(--page); padding: 8px 0; }
+.seg { display: inline-flex; border: 1px solid var(--ring); border-radius: 8px; overflow: hidden; }
+.seg span { color: var(--muted); font-size: 12px; padding: 6px 8px; align-self: center; }
+.seg button { border: 0; background: transparent; color: var(--ink-2); padding: 6px 12px; cursor: pointer; font: inherit; }
+.seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--ink); font-weight: 600; }
+.seg button:focus-visible, .btn:focus-visible, .thumb:focus-visible { outline: 2px solid var(--s1); outline-offset: 1px; }
+.btn { border: 1px solid var(--ring); background: var(--surface-1); color: var(--ink-2); border-radius: 6px;
+  padding: 4px 10px; cursor: pointer; font: inherit; font-size: 12.5px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile { background: var(--surface-1); border: 1px solid var(--ring); border-radius: 10px; padding: 12px 14px; }
+.tile .k { color: var(--ink-2); font-size: 12.5px; }
+.tile .v { font-size: 26px; font-weight: 600; margin-top: 2px; }
+.tile .n { color: var(--muted); font-size: 12px; }
+.grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+.card { background: var(--surface-1); border: 1px solid var(--ring); border-radius: 12px; padding: 16px; min-width: 0; }
+.wide { grid-column: 1 / -1; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+#calib svg { max-width: 460px; margin: 0 auto; }
+#recall svg { max-width: 560px; }
+svg text { fill: var(--ink-2); font-size: 11px; }
+.cell { cursor: pointer; }
+.cell:hover rect.bg { stroke: var(--ink); stroke-width: 1.5; }
+.hdr { cursor: pointer; }
+.hdr:hover text { fill: var(--ink); text-decoration: underline; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--ink-2); margin-top: 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+canvas { display: block; width: 100%; border-radius: 8px; background: var(--surface-1); touch-action: none; }
+#tip { position: fixed; pointer-events: none; z-index: 20; background: var(--surface-1); color: var(--ink);
+  border: 1px solid var(--ring); border-radius: 8px; padding: 8px 10px; font-size: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.14); max-width: 260px; display: none; }
+#tip img { width: 96px; height: 96px; border-radius: 4px; display: block; margin-bottom: 6px; }
+#tip .m { color: var(--ink-2); }
+table { border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; margin-top: 8px; width: 100%; }
+th, td { border-bottom: 1px solid var(--grid); padding: 4px 6px; text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+.gal-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.gal-body { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; }
+@media (max-width: 860px) { .gal-body { grid-template-columns: minmax(0, 1fr); } }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; align-content: start; }
+.thumb { background: none; border: 2px solid transparent; border-radius: 6px; padding: 0; cursor: pointer; color: inherit; font: inherit; text-align: left; }
+.thumb img { width: 100%; aspect-ratio: 1; display: block; border-radius: 4px; }
+.thumb .c { font-size: 10.5px; color: var(--ink-2); padding: 2px 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.thumb[aria-current="true"] { border-color: var(--s1); }
+.detail { background: var(--surface-2); border-radius: 10px; padding: 12px; align-self: start; position: sticky; top: 64px; }
+.detail img { width: 100%; max-width: 256px; aspect-ratio: 1; border-radius: 6px; display: block; margin-bottom: 8px; }
+.pbar { display: grid; grid-template-columns: 92px 1fr 44px; gap: 6px; align-items: center; font-size: 12px; margin: 3px 0; }
+.pbar .t { height: 8px; background: var(--grid); border-radius: 4px; overflow: hidden; }
+.pbar .f { height: 100%; background: var(--s1); border-radius: 4px; }
+.pbar .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.note { color: var(--muted); font-size: 12.5px; padding: 12px 0; grid-column: 1 / -1; }
+.foot { color: var(--muted); font-size: 12px; margin-top: 24px; }
+.lede a { color: var(--s1); }
+.guide { background: var(--surface-1); border: 1px solid var(--ring); border-radius: 12px; padding: 14px 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 20px; font-size: 13.5px; color: var(--ink-2); }
+@media (max-width: 860px) { .guide { grid-template-columns: minmax(0, 1fr); } }
+.guide b { color: var(--ink); }
+.guide .step { display: inline-flex; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: var(--surface-1); font-size: 12px; font-weight: 600; align-items: center; justify-content: center; margin-right: 8px; }
+.guide-note { grid-column: 1 / -1; margin: 0; font-size: 12.5px; color: var(--muted); }
+.look { display: block; margin-top: 3px; color: var(--ink); }
+.ctrls { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 4px; font-size: 12.5px; color: var(--ink-2); }
+select { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--surface-1); border: 1px solid var(--ring);
+  border-radius: 6px; padding: 4px 6px; margin-left: 6px; }
+.seg-rect { cursor: pointer; }
+.seg-rect:hover { stroke: var(--ink); stroke-width: 1.5; }
+.ramp { display: inline-block; width: 90px; height: 8px; border-radius: 4px; vertical-align: 0; margin: 0 6px; }
+.props { display: grid; grid-template-columns: 1fr auto; gap: 1px 10px; font-size: 12px; margin-top: 8px; color: var(--ink-2); }
+.props b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>AstroVision Model Explorer</h1>
+  <p class="lede">An interactive tool to explore where the galaxy classifier gets things right and wrong. For the short version, see <a href="findings.html">the key takeaways</a>.</p>
+  <div class="guide">
+    <div><span class="step">1</span><b>Pick a group of galaxies.</b> Click a square in the table of answers (for example "true Irregular, model says Spiral"), or use the "All mistakes" button.</div>
+    <div><span class="step">2</span><b>See where they are.</b> The selected galaxies light up on the map and appear as pictures in the gallery at the bottom.</div>
+    <div><span class="step">3</span><b>Click a picture</b> to see how sure the model was about each class.</div>
+    <p class="guide-note">The model has 5 classes: Spiral, Elliptical, Edge-on Disk, Irregular (called "Disturbed" in the original 10 Galaxy10 types) and Merger.</p>
+  </div>
+
+  <div class="filters" role="toolbar" aria-label="Filters">
+    <div class="seg" data-key="split"><span>Images</span><button data-v="0">New (not trained on)</button><button data-v="1">Training</button></div>
+    <div class="seg" data-key="rows"><span>True classes</span><button data-v="5">5 model classes</button><button data-v="10">10 detailed types</button></div>
+    <div class="seg" data-key="norm"><span>Show</span><button data-v="pct">Percent</button><button data-v="count">Number of galaxies</button></div>
+  </div>
+
+  <section class="tiles" id="tiles" aria-label="Summary"></section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>What the model answers for each true class</h2>
+      <p class="sub" id="cm-sub">Each row is one true class; each column is the model's answer. Outlined squares are correct answers. <span class="look">Look for: dark squares outside the outlined ones, which are common mistakes.</span></p>
+      <div id="cm"></div>
+      <div style="margin-top:8px"><button class="btn" id="tbl-toggle" aria-expanded="false">Show as table</button></div>
+      <div id="cm-table" hidden></div>
+    </section>
+
+    <section class="card">
+      <h2>How often each class is recognised</h2>
+      <p class="sub">Share of each true class that the model gets right. <span class="look">Look for: short bars, which are classes the model struggles with.</span></p>
+      <div id="recall"></div>
+    </section>
+
+    <section class="card">
+      <h2>Map of the model's answers</h2>
+      <p class="sub">Each dot is a galaxy. Galaxies close together got similar answers from the model (t-SNE of its output probabilities). Hover a dot to see the galaxy, click to inspect it. <span class="look">Look for: orange mistakes gathering in the same places.</span></p>
+      <div class="ctrls"><label>Colour points by <select id="map-col"></select></label></div>
+      <canvas id="emb" aria-label="t-SNE map of model output probabilities, validation images"></canvas>
+      <div class="legend" id="emb-legend"></div>
+    </section>
+
+    <section class="card">
+      <h2>Is the model as sure as it should be?</h2>
+      <p class="sub">When the model says it is X% sure, is it right X% of the time? If yes, the dots lie on the grey diagonal line. <span class="look">Look for: dots below the line, where the model is overconfident.</span></p>
+      <div id="calib"></div>
+    </section>
+
+    <section class="card wide">
+      <h2>Does the answer depend on what the galaxy looks like?</h2>
+      <p class="sub">Pick a property (for example apparent size) and a true class. Each bar is a group of galaxies, from low to high values of that property (same number of galaxies per bar). Grey = answered correctly, colours = what the model said instead; the number on top is % correct. Click a coloured part to see those galaxies. <span class="look">Look for: bars where the coloured part grows, which shows what makes the model go wrong.</span></p>
+      <div class="ctrls">
+        <label>Property <select id="prop-sel"></select></label>
+        <label>True class <select id="cls-sel"></select></label>
+      </div>
+      <div id="propchart"></div>
+      <div class="legend" id="prop-legend"></div>
+      <p class="sub" id="prop-desc" style="margin-top:6px"></p>
+    </section>
+
+    <section class="card wide">
+      <div class="gal-head">
+        <div><h2 id="gal-title">Gallery</h2><p class="sub" id="gal-sub" style="margin:0"></p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" id="sel-wrong">All mistakes</button>
+          <div class="seg" data-key="sort"><span>Order by how sure</span><button data-v="desc">Most sure first</button><button data-v="asc">Least sure first</button></div>
+        </div>
+      </div>
+      <div class="gal-body">
+        <div><div class="gallery" id="gallery"></div><div style="margin-top:10px"><button class="btn" id="more" hidden>Show more</button></div></div>
+        <aside class="detail" id="detail" aria-live="polite"><p class="note">Click a galaxy to see its class probabilities.</p></aside>
+      </div>
+    </section>
+  </div>
+
+  <p class="foot">Data: Galaxy10 DECals (Leung &amp; Bovy; Galaxy Zoo DECaLS volunteers). Validation split reproduced from the author's train.py (seed 42, 20%). Thumbnails are 160px centre crops downsampled to 64px.</p>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script src="explorer_data.js"></script>
+<script src="thumbs.js"></script>
+<script>
+(() => {
+const D = window.EXPLORER_DATA, T = window.EXPLORER_THUMBS || {};
+const C5 = D.classes, C10 = D.classes10;
+const R = D.rows.map(r => ({ idx: r[0], split: r[1], l10: r[2], l5: r[3], pred: r[4], p: r[5],
+  xy: r[6], q: r[7] || [], conf: Math.max(...r[5]) }));
+const P = D.props || [];
+const CCOL = i => `var(--c${i})`;
+const fmt = v => v == null ? "–" : Math.abs(v) < 0.1 ? v.toFixed(3) : Math.abs(v) < 10 ? v.toFixed(2) : v.toFixed(0);
+const clsMatch = (d, spec) => spec === "all" || (spec.startsWith("10:") ? d.l10 === +spec.slice(3) : d.l5 === +spec.slice(2));
+const clsName = spec => spec === "all" ? "all classes" : spec.startsWith("10:") ? C10[+spec.slice(3)] : C5[+spec.slice(2)];
+const clsParent = spec => spec.startsWith("10:") ? D.map10to5[+spec.slice(3)] : +spec.slice(2);
+const ORDER10 = [5, 6, 7, 2, 3, 4, 8, 9, 0, 1];   // grouped by merged parent class
+const SHORT = ["Spiral", "Ellip.", "Edge-on", "Irreg.", "Merger"];  // gallery captions
+const S = { split: 0, rows: "5", norm: "pct", sort: "desc", sel: { kind: "wrong" }, focus: null, shown: 96,
+  prop: 1, cls: "5:3", mapColor: "err" };   // opens on Irregular vs size: the clearest pattern
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const isDark = () => css("--is-dark") === "1";
+const pct = (v, d = 1) => (100 * v).toFixed(d) + "%";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const thumb = i => T[i] ? "data:image/jpeg;base64," + T[i] : "";
+
+// ---- selection logic ----
+const rowKey = d => S.rows === "5" ? d.l5 : d.l10;
+const rowList = () => S.rows === "5" ? [0, 1, 2, 3, 4] : ORDER10;
+const rowName = k => S.rows === "5" ? C5[k] : C10[k];
+const rowParent = k => S.rows === "5" ? k : D.map10to5[k];
+const cur = () => R.filter(d => d.split === S.split);
+function inSel(d) {
+  const s = S.sel; if (!s) return false;
+  if (s.kind === "wrong") return d.pred !== d.l5;
+  if (s.kind === "prop") {
+    const v = d.q[s.prop];
+    if (v == null || !(s.first ? v >= s.lo : v > s.lo) || v > s.hi || !clsMatch(d, s.cls)) return false;
+    return s.pred === -1 ? d.pred !== d.l5 : s.pred === -2 ? d.pred === d.l5 : d.pred === s.pred;
+  }
+  if (s.rows && s.rows !== S.rows && s.kind !== "col") return false;
+  if (s.kind === "cell") return rowKey(d) === s.r && d.pred === s.c;
+  if (s.kind === "row") return rowKey(d) === s.r;
+  if (s.kind === "col") return d.pred === s.c;
+  return false;
+}
+function selLabel() {
+  const s = S.sel; if (!s) return "Nothing selected";
+  if (s.kind === "wrong") return "All mistakes";
+  if (s.kind === "cell") return `True ${rowName(s.r)} → predicted ${C5[s.c]}`;
+  if (s.kind === "row") return `All true ${rowName(s.r)}`;
+  if (s.kind === "prop") return `${P[s.prop].name} ${fmt(s.lo)}–${fmt(s.hi)} · true ${clsName(s.cls)} · ` +
+    (s.pred === -1 ? "misclassified" : s.pred === -2 ? "correct" : `predicted ${C5[s.pred]}`);
+  return `All predicted ${C5[s.c]}`;
+}
+function select(sel) { S.sel = sel; S.focus = null; S.shown = 96; renderAll(); }
+
+// ---- tooltip ----
+const tip = $("tip");
+function showTip(html, x, y) {
+  tip.innerHTML = html; tip.style.display = "block";
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = Math.min(x + 14, innerWidth - w - 8) + "px";
+  tip.style.top = (y + h + 20 > innerHeight ? y - h - 14 : y + 14) + "px";
+}
+const hideTip = () => { tip.style.display = "none"; };
+
+// ---- colour: one-hue sequential blue ramp ----
+const RAMP_L = ["#e6f0fc", "#cde2fb", "#b7d3f6", "#9ec5f4", "#86b6ef", "#6da7ec", "#5598e7", "#3987e5", "#2a78d6", "#256abf", "#1c5cab", "#184f95", "#104281"];
+const RAMP_D = ["#14243a", "#0d366b", "#104281", "#184f95", "#1c5cab", "#256abf", "#2a78d6", "#3987e5", "#5598e7", "#6da7ec", "#86b6ef", "#9ec5f4", "#b7d3f6"];
+function hex2rgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+function rampColor(v) {
+  const R_ = isDark() ? RAMP_D : RAMP_L, t = Math.max(0, Math.min(1, v)) * (R_.length - 1);
+  const i = Math.floor(t), f = t - i, a = hex2rgb(R_[i]), b = hex2rgb(R_[Math.min(i + 1, R_.length - 1)]);
+  return `rgb(${a.map((x, j) => Math.round(x + (b[j] - x) * f)).join(",")})`;
+}
+const cellInk = v => isDark() ? (v > 0.62 ? "#0b0b0b" : "#f0efec") : (v > 0.45 ? "#ffffff" : "#0b0b0b");
+
+// ---- tiles ----
+function renderTiles() {
+  const d = cur(), n = d.length, acc = d.filter(x => x.pred === x.l5).length / n;
+  const rec = C5.map((_, k) => { const g = d.filter(x => x.l5 === k); return g.filter(x => x.pred === k).length / g.length; });
+  const macro = rec.reduce((a, b) => a + b, 0) / 5, worst = rec.indexOf(Math.min(...rec));
+  const ece = calibBins(d).reduce((a, b) => a + b.n / n * Math.abs(b.acc - b.conf), 0);
+  $("tiles").innerHTML = [
+    ["Correct answers", pct(acc), `of ${n.toLocaleString()} ${S.split ? "training" : "new"} galaxies · the author reports 92.9%`],
+    ["Average per class", pct(macro), "each of the 5 classes counts equally"],
+    ["Hardest class", pct(rec[worst]), `of ${C5[worst]} galaxies are recognised`],
+    ["Confidence gap", pct(ece), "how far its confidence is from reality, on average"],
+  ].map(([k, v, s]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${s}</div></div>`).join("");
+}
+
+// ---- confusion matrix (SVG) ----
+function renderCM() {
+  const d = cur(), rows = rowList();
+  const cnt = rows.map(k => C5.map((_, c) => d.filter(x => rowKey(x) === k && x.pred === c).length));
+  const tot = cnt.map(r => r.reduce((a, b) => a + b, 0));
+  const LW = S.rows === "5" ? 104 : 176, CW = 70, CH = S.rows === "5" ? 44 : 32, TOP = 40, GAP = 2;
+  const W = LW + 5 * CW + 56, H = TOP + rows.length * CH + 8;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Confusion matrix">`;
+  s += `<text x="${LW + 2.5 * CW}" y="11" text-anchor="middle" style="fill:var(--muted)">model's answer →</text><text x="${LW - 8}" y="11" text-anchor="end" style="fill:var(--muted)">true class ↓</text>`;
+  C5.forEach((c, j) => s += `<g class="hdr" data-col="${j}"><text x="${LW + j * CW + CW / 2}" y="${TOP - 8}" text-anchor="middle">${esc(c)}</text></g>`);
+  s += `<text x="${LW + 5 * CW + 8}" y="${TOP - 8}" style="fill:var(--muted)">galaxies</text>`;
+  rows.forEach((k, i) => {
+    const y = TOP + i * CH, par = rowParent(k);
+    s += `<g class="hdr" data-row="${k}"><text x="${LW - 8}" y="${y + CH / 2 + 4}" text-anchor="end">${esc(rowName(k))}</text></g>`;
+    C5.forEach((_, j) => {
+      const n = cnt[i][j], v = tot[i] ? n / tot[i] : 0, x = LW + j * CW;
+      const sel = S.sel && S.sel.kind === "cell" && S.sel.r === k && S.sel.c === j && S.sel.rows === S.rows;
+      const fill = n ? rampColor(v) : "var(--surface-2)";
+      const label = S.norm === "pct" ? (n ? (v < 0.001 ? "<0.1%" : pct(v, v < 0.1 ? 1 : 0)) : "") : (n ? n : "");
+      s += `<g class="cell" data-r="${k}" data-c="${j}" data-n="${n}" data-v="${v}" tabindex="0">
+        <rect class="bg" x="${x + GAP / 2}" y="${y + GAP / 2}" width="${CW - GAP}" height="${CH - GAP}" rx="4" fill="${fill}"/>
+        ${j === par ? `<rect x="${x + 3}" y="${y + 3}" width="${CW - 6}" height="${CH - 6}" rx="3" fill="none" stroke="${cellInk(v)}" stroke-opacity=".55" stroke-width="1.5"/>` : ""}
+        ${sel ? `<rect x="${x + GAP / 2}" y="${y + GAP / 2}" width="${CW - GAP}" height="${CH - GAP}" rx="4" fill="none" stroke="var(--s2)" stroke-width="3"/>` : ""}
+        <text x="${x + CW / 2}" y="${y + CH / 2 + 4}" text-anchor="middle" style="fill:${n ? cellInk(v) : "var(--muted)"};font-variant-numeric:tabular-nums">${label}</text></g>`;
+    });
+    s += `<text x="${LW + 5 * CW + 8}" y="${y + CH / 2 + 4}" style="fill:var(--muted);font-variant-numeric:tabular-nums">${tot[i]}</text>`;
+    if (S.rows === "10" && i > 0 && rowParent(rows[i - 1]) !== par)
+      s += `<line x1="8" x2="${LW + 5 * CW}" y1="${y}" y2="${y}" stroke="var(--axis)"/>`;
+  });
+  $("cm").innerHTML = s + "</svg>";
+  $("cm").querySelectorAll(".cell").forEach(g => {
+    const k = +g.dataset.r, j = +g.dataset.c, n = +g.dataset.n, v = +g.dataset.v;
+    const go = () => select({ kind: "cell", r: k, c: j, rows: S.rows });
+    g.addEventListener("click", go);
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    g.addEventListener("mousemove", e => showTip(`<b>True ${esc(rowName(k))}</b><br>predicted ${esc(C5[j])}<br><span class="m">${n} images · ${pct(v)} of row</span>`, e.clientX, e.clientY));
+    g.addEventListener("mouseleave", hideTip);
+  });
+  $("cm").querySelectorAll("[data-row]").forEach(g => g.addEventListener("click", () => select({ kind: "row", r: +g.dataset.row, rows: S.rows })));
+  $("cm").querySelectorAll("[data-col]").forEach(g => g.addEventListener("click", () => select({ kind: "col", c: +g.dataset.col })));
+  // accessible table view
+  $("cm-table").innerHTML = `<table><thead><tr><th>True \\ Pred</th>${C5.map(c => `<th>${esc(c)}</th>`).join("")}<th>n</th></tr></thead><tbody>` +
+    rows.map((k, i) => `<tr><td>${esc(rowName(k))}</td>${cnt[i].map(n => `<td>${n}</td>`).join("")}<td>${tot[i]}</td></tr>`).join("") + "</tbody></table>";
+}
+
+// ---- recall bars ----
+function renderRecall() {
+  const d = cur(), rows = rowList();
+  const data = rows.map(k => { const g = d.filter(x => rowKey(x) === k); return { k, n: g.length, r: g.filter(x => x.pred === rowParent(k)).length / g.length }; });
+  const LW = S.rows === "5" ? 96 : 166, BW = 260, BH = S.rows === "5" ? 30 : 24, TOP = 6;
+  const W = LW + BW + 56, H = TOP + data.length * BH + 22;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Recall per true class">`;
+  [0, .25, .5, .75, 1].forEach(t => {
+    const x = LW + t * BW;
+    s += `<line x1="${x}" x2="${x}" y1="${TOP}" y2="${H - 18}" stroke="var(--grid)"/><text x="${x}" y="${H - 4}" text-anchor="middle" style="fill:var(--muted)">${t * 100}%</text>`;
+  });
+  data.forEach((o, i) => {
+    const y = TOP + i * BH, w = Math.max(2, o.r * BW), on = S.sel && S.sel.kind === "row" && S.sel.r === o.k && S.sel.rows === S.rows;
+    s += `<g class="hdr" data-row="${o.k}" data-n="${o.n}" data-v="${o.r}">
+      <rect x="0" y="${y}" width="${W}" height="${BH}" fill="transparent"/>
+      <text x="${LW - 8}" y="${y + BH / 2 + 4}" text-anchor="end">${esc(rowName(o.k))}</text>
+      <rect x="${LW}" y="${y + BH * 0.25}" width="${w}" height="${BH * 0.5}" rx="4" fill="${on ? "var(--s2)" : "var(--s1)"}"/>
+      <text x="${LW + w + 6}" y="${y + BH / 2 + 4}" style="fill:var(--ink);font-variant-numeric:tabular-nums">${pct(o.r)}</text></g>`;
+  });
+  $("recall").innerHTML = s + "</svg>";
+  $("recall").querySelectorAll("[data-row]").forEach(g => {
+    g.addEventListener("click", () => select({ kind: "row", r: +g.dataset.row, rows: S.rows }));
+    g.addEventListener("mousemove", e => showTip(`<b>${esc(rowName(+g.dataset.row))}</b><br><span class="m">recall ${pct(+g.dataset.v)} · n = ${g.dataset.n}</span>`, e.clientX, e.clientY));
+    g.addEventListener("mouseleave", hideTip);
+  });
+}
+
+// ---- calibration ----
+function calibBins(d) {
+  const B = Array.from({ length: 10 }, (_, i) => ({ lo: i / 10, n: 0, ok: 0, cs: 0 }));
+  d.forEach(x => { const b = B[Math.min(9, Math.floor(x.conf * 10))]; b.n++; b.cs += x.conf; b.ok += x.pred === x.l5; });
+  return B.filter(b => b.n).map(b => ({ lo: b.lo, n: b.n, acc: b.ok / b.n, conf: b.cs / b.n }));
+}
+function renderCalib() {
+  const d = cur(), B = calibBins(d), N = d.length;
+  const L = 44, P = 340, TOP = 8, HS = 46, W = L + P + 16, H = TOP + P + 52 + HS + 6;
+  const X = v => L + v * P, Y = v => TOP + (1 - v) * P;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Reliability diagram">`;
+  [0, .2, .4, .6, .8, 1].forEach(t => {
+    s += `<line x1="${X(0)}" x2="${X(1)}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--grid)"/>`;
+    s += `<text x="${L - 6}" y="${Y(t) + 4}" text-anchor="end" style="fill:var(--muted)">${t * 100}%</text>`;
+    s += `<text x="${X(t)}" y="${TOP + P + 16}" text-anchor="middle" style="fill:var(--muted)">${t * 100}%</text>`;
+  });
+  s += `<line x1="${X(0)}" y1="${Y(0)}" x2="${X(1)}" y2="${Y(1)}" stroke="var(--axis)" stroke-width="1.5"/>`;
+  s += `<text x="${X(.62)}" y="${Y(.56)}" style="fill:var(--muted)" transform="rotate(-45 ${X(.62)} ${Y(.56)})">perfectly honest</text>`;
+  s += `<text x="${X(.5)}" y="${TOP + P + 30}" text-anchor="middle">how sure the model was</text>`;
+  s += `<text x="12" y="${Y(.5)}" text-anchor="middle" transform="rotate(-90 12 ${Y(.5)})">% right</text>`;
+  s += `<polyline points="${B.map(b => `${X(b.conf)},${Y(b.acc)}`).join(" ")}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/>`;
+  B.forEach((b, i) => s += `<circle class="cb" data-i="${i}" cx="${X(b.conf)}" cy="${Y(b.acc)}" r="5" fill="var(--s1)" stroke="var(--surface-1)" stroke-width="2"/>
+     <circle class="cb" data-i="${i}" cx="${X(b.conf)}" cy="${Y(b.acc)}" r="14" fill="transparent"/>`);
+  // share-of-images strip (its own scale, below the plot)
+  const y0 = TOP + P + 60, mx = Math.max(...B.map(b => b.n));
+  s += `<text x="${L}" y="${y0 - 2}" style="fill:var(--muted)">how many galaxies fall in each group</text>`;
+  B.forEach((b, i) => { const h = Math.max(1, b.n / mx * (HS - 8)); s += `<rect class="cb" data-i="${i}" x="${X(b.lo) + 1}" y="${y0 + HS - h}" width="${P / 10 - 2}" height="${h}" rx="2" fill="var(--muted)" opacity=".55"/>`; });
+  s += `<line x1="${X(0)}" x2="${X(1)}" y1="${y0 + HS}" y2="${y0 + HS}" stroke="var(--axis)"/>`;
+  $("calib").innerHTML = s + "</svg>";
+  $("calib").querySelectorAll(".cb").forEach(c => {
+    const b = B[+c.dataset.i];
+    c.addEventListener("mousemove", e => showTip(`<b>Confidence ${b.lo * 100}–${b.lo * 100 + 10}%</b><br>accuracy ${pct(b.acc)} vs mean confidence ${pct(b.conf)}<br><span class="m">${b.n} images (${pct(b.n / N)})</span>`, e.clientX, e.clientY));
+    c.addEventListener("mouseleave", hideTip);
+  });
+}
+
+// ---- behaviour vs input property (100% stacked bars over equal-count bins) ----
+function propBins(d, k) {
+  const vals = d.map(x => x.q[k]).sort((a, b) => a - b);
+  const NB = Math.max(1, Math.min(8, Math.floor(vals.length / 25)));
+  const hi = [...Array(NB)].map((_, i) => vals[Math.round((i + 1) * (vals.length - 1) / NB)]);
+  const bins = hi.map((h, i) => ({ lo: i ? hi[i - 1] : vals[0], hi: h, first: i === 0, items: [] }));
+  d.forEach(x => { const v = x.q[k]; let j = bins.findIndex(b => v <= b.hi); bins[j < 0 ? NB - 1 : j].items.push(x); });
+  return bins.filter(b => b.items.length);
+}
+function renderProp() {
+  const k = S.prop, all = S.cls === "all";
+  const d = cur().filter(x => clsMatch(x, S.cls) && x.q[k] != null);
+  $("prop-desc").textContent = P[k] ? `${P[k].name}: ${P[k].desc}. ${d.length} ${S.split ? "training" : "new"} galaxies.` : "";
+  if (!d.length) { $("propchart").innerHTML = `<p class="note">No images with this property.</p>`; return; }
+  const bins = propBins(d, k), par = all ? null : clsParent(S.cls);
+  // segment order: correct first (bottom), then the other predicted classes
+  // correct share is drawn neutral so the eye goes to the errors; errors keep their predicted-class colour
+  const segs = all ? [{ key: -2, name: "correct", col: "var(--axis)" }, { key: -1, name: "mistake", col: "var(--s2)" }]
+    : [par, ...[0, 1, 2, 3, 4].filter(c => c !== par)].map(c => ({ key: c, name: C5[c], col: c === par ? "var(--axis)" : CCOL(c) }));
+  const L = 44, PW = 820, PH = 220, TOP = 22, W = L + PW + 10, H = TOP + PH + 44;
+  const bw = PW / bins.length, Y = v => TOP + (1 - v) * PH;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Predictions across ${esc(P[k].name)} bins">`;
+  [0, .25, .5, .75, 1].forEach(t => s += `<line x1="${L}" x2="${L + PW}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--grid)"/><text x="${L - 6}" y="${Y(t) + 4}" text-anchor="end" style="fill:var(--muted)">${t * 100}%</text>`);
+  bins.forEach((b, i) => {
+    const n = b.items.length, w = Math.min(bw - 12, 64), x = L + i * bw + (bw - w) / 2;
+    const ok = b.items.filter(x => x.pred === x.l5).length / n;
+    let acc = 0;
+    segs.forEach(sg => {
+      const m = b.items.filter(x => sg.key === -2 ? x.pred === x.l5 : sg.key === -1 ? x.pred !== x.l5 : x.pred === sg.key).length;
+      if (!m) return;
+      const h = m / n * PH, y = Y(acc) - h;
+      s += `<rect class="seg-rect" data-b="${i}" data-k="${sg.key}" data-m="${m}" x="${x}" y="${y + 1}" width="${w}" height="${Math.max(0.5, h - 2)}" rx="${h > 6 ? 3 : 1}" fill="${sg.col}"/>`;
+      acc += m / n;
+    });
+    s += `<text x="${x + w / 2}" y="${TOP - 6}" text-anchor="middle" style="fill:var(--ink);font-variant-numeric:tabular-nums">${pct(ok, 0)}</text>`;
+    s += `<text x="${x + w / 2}" y="${TOP + PH + 16}" text-anchor="middle" style="font-variant-numeric:tabular-nums">${fmt(b.lo)}–${fmt(b.hi)}</text>`;
+    s += `<text x="${x + w / 2}" y="${TOP + PH + 30}" text-anchor="middle" style="fill:var(--muted)">${n} galaxies</text>`;
+  });
+  s += `<text x="${L + PW / 2}" y="${H - 1}" text-anchor="middle" style="fill:var(--muted)">${esc(P[k].name)} (low → high)</text>`;
+  $("propchart").innerHTML = s + "</svg>";
+  $("prop-legend").innerHTML = segs.map(sg => `<span><i style="background:${sg.col}"></i>${all ? sg.name : "predicted " + esc(sg.name)}${!all && sg.key === par ? " (correct)" : ""}</span>`).join("");
+  $("propchart").querySelectorAll(".seg-rect").forEach(r => {
+    const b = bins[+r.dataset.b], key = +r.dataset.k, m = +r.dataset.m, sg = segs.find(x => x.key === key);
+    r.addEventListener("mousemove", e => showTip(`<b>${esc(P[k].name)} ${fmt(b.lo)}–${fmt(b.hi)}</b><br>true ${esc(clsName(S.cls))}<br>${all ? esc(sg.name) : "predicted " + esc(sg.name)}: <b>${m}</b> of ${b.items.length} (${pct(m / b.items.length)})`, e.clientX, e.clientY));
+    r.addEventListener("mouseleave", hideTip);
+    r.addEventListener("click", () => select({ kind: "prop", prop: k, lo: b.lo, hi: b.hi, first: b.first, cls: S.cls, pred: key }));
+  });
+}
+
+// ---- embedding (canvas) ----
+const cv = $("emb"), ctx = cv.getContext("2d");
+let embPts = [];
+function renderEmb() {
+  const w = cv.clientWidth, h = Math.min(440, Math.max(300, w * 0.8)), dpr = devicePixelRatio || 1;
+  cv.style.height = h + "px"; cv.width = w * dpr; cv.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const pad = 10, V = R.filter(d => d.split === 0 && d.xy);
+  embPts = V.map(d => ({ d, x: pad + d.xy[0] * (w - 2 * pad), y: pad + (1 - d.xy[1]) * (h - 2 * pad) }));
+  const muted = css("--muted"), s1 = css("--s1"), s2 = css("--s2"), surf = css("--surface-1");
+  ctx.clearRect(0, 0, w, h);
+  const sel = embPts.filter(p => inSel(p.d)), selIds = new Set(sel.map(p => p.d.idx));
+  const showSel = S.sel && S.sel.kind !== "wrong";
+  let legendBase;
+  if (S.mapColor === "err") {
+    ctx.globalAlpha = showSel ? 0.28 : 0.45; ctx.fillStyle = muted;
+    embPts.forEach(p => { if (p.d.pred === p.d.l5) { ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, 7); ctx.fill(); } });
+    ctx.globalAlpha = showSel ? 0.45 : 0.9; ctx.fillStyle = s2;
+    embPts.forEach(p => { if (p.d.pred !== p.d.l5 && !(showSel && selIds.has(p.d.idx))) { ctx.beginPath(); ctx.arc(p.x, p.y, 2.6, 0, 7); ctx.fill(); } });
+    legendBase = `<span><i style="background:${muted}"></i>correct</span><span><i style="background:${s2}"></i>mistake</span>`;
+  } else {
+    // sequential one-hue ramp over the 2nd–98th percentile; marks start at a mid step so low values stay visible
+    const k = +S.mapColor, v = embPts.map(p => p.d.q[k]).filter(x => x != null).sort((a, b) => a - b);
+    const lo = v[Math.floor(v.length * .02)], hi = v[Math.floor(v.length * .98)];
+    const t = x => 0.3 + 0.7 * Math.max(0, Math.min(1, (x - lo) / (hi - lo || 1)));
+    ctx.globalAlpha = showSel ? 0.35 : 0.85;
+    embPts.forEach(p => { const x = p.d.q[k]; ctx.fillStyle = x == null ? muted : rampColor(t(x)); ctx.beginPath(); ctx.arc(p.x, p.y, 2.3, 0, 7); ctx.fill(); });
+    legendBase = `<span>${esc(P[k].name)}: ${fmt(lo)}<span class="ramp" style="background:linear-gradient(90deg,${rampColor(.3)},${rampColor(1)})"></span>${fmt(hi)}</span>`;
+  }
+  ctx.globalAlpha = 1;
+  const selCol = S.mapColor === "err" ? s1 : s2;   // selection must contrast with the blue ramp
+  if (showSel) sel.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, 7); ctx.fillStyle = selCol; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = surf; ctx.stroke(); });
+  const f = S.focus != null && embPts.find(p => p.d.idx === S.focus);
+  if (f) { ctx.beginPath(); ctx.arc(f.x, f.y, 8, 0, 7); ctx.lineWidth = 2; ctx.strokeStyle = css("--ink"); ctx.stroke(); }
+  $("emb-legend").innerHTML = legendBase +
+    (showSel ? `<span><i style="background:${selCol}"></i>selected: ${esc(selLabel())} (${sel.length})</span>` : "") +
+    (S.split === 1 ? `<span>The map always shows the new galaxies; the table above shows training galaxies.</span>` : "");
+}
+function nearest(e) {
+  const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  let best = null, bd = 144;
+  embPts.forEach(p => { const dd = (p.x - x) ** 2 + (p.y - y) ** 2; if (dd < bd) { bd = dd; best = p; } });
+  return best;
+}
+const probLine = d => d.p.map((v, i) => [v, i]).sort((a, b) => b[0] - a[0]).slice(0, 3).map(([v, i]) => `${esc(C5[i])} ${pct(v)}`).join(" · ");
+cv.addEventListener("mousemove", e => {
+  const p = nearest(e); if (!p) { hideTip(); cv.style.cursor = "default"; return; }
+  cv.style.cursor = "pointer"; const d = p.d;
+  showTip(`${thumb(d.idx) ? `<img src="${thumb(d.idx)}" alt="">` : ""}<b>${esc(C10[d.l10])}</b> <span class="m">(${esc(C5[d.l5])})</span><br>predicted <b>${esc(C5[d.pred])}</b><br><span class="m">${probLine(d)}</span>`, e.clientX, e.clientY);
+});
+cv.addEventListener("mouseleave", hideTip);
+cv.addEventListener("click", e => { const p = nearest(e); if (p) { S.focus = p.d.idx; renderEmb(); renderGallery(); renderDetail(); } });
+
+// ---- gallery + detail ----
+function galleryItems() {
+  return R.filter(d => d.split === 0 && inSel(d)).sort((a, b) => S.sort === "desc" ? b.conf - a.conf : a.conf - b.conf);
+}
+function renderGallery() {
+  $("gal-title").textContent = "Gallery · " + selLabel();
+  if (S.split === 1) {
+    $("gal-sub").textContent = "";
+    $("gallery").innerHTML = `<p class="note">Pictures are only available for the new galaxies. Switch "Images" at the top to "New" to see them.</p>`;
+    $("more").hidden = true; return;
+  }
+  const items = galleryItems();
+  $("gal-sub").textContent = `${items.length} galaxies · under each picture: the model's answer and how sure it was (✗ = wrong)`;
+  $("gallery").innerHTML = items.slice(0, S.shown).map(d => `<button class="thumb" data-i="${d.idx}" aria-current="${d.idx === S.focus}" title="${esc(C10[d.l10])} → ${esc(C5[d.pred])}">
+      <img loading="lazy" src="${thumb(d.idx)}" alt="${esc(C10[d.l10])} galaxy, predicted ${esc(C5[d.pred])}">
+      <div class="c">${d.pred === d.l5 ? "" : "✗ "}${SHORT[d.pred]} ${pct(d.conf, 0)}</div></button>`).join("") ||
+    `<p class="note">No validation galaxies in this selection.</p>`;
+  $("more").hidden = items.length <= S.shown;
+  $("gallery").querySelectorAll(".thumb").forEach(b => b.addEventListener("click", () => { S.focus = +b.dataset.i; renderEmb(); renderGallery(); renderDetail(); }));
+}
+function renderDetail() {
+  const d = R.find(x => x.idx === S.focus);
+  if (!d) { $("detail").innerHTML = `<p class="note">Click a galaxy to see its class probabilities.</p>`; return; }
+  $("detail").innerHTML = `<img src="${thumb(d.idx)}" alt="${esc(C10[d.l10])} galaxy">
+    <div><b>${esc(C10[d.l10])}</b> <span style="color:var(--ink-2)">→ merged: ${esc(C5[d.l5])}</span></div>
+    <div style="margin:2px 0 8px;color:var(--ink-2)">Predicted <b style="color:var(--ink)">${esc(C5[d.pred])}</b> ${d.pred === d.l5 ? "· correct" : "· <b>wrong</b>"}</div>
+    ${d.p.map((v, i) => `<div class="pbar"><span>${esc(C5[i])}</span><div class="t"><div class="f" style="width:${Math.max(1, v * 100)}%;${i === d.l5 ? "" : "opacity:.55"}"></div></div><span class="num">${pct(v)}</span></div>`).join("")}
+    <div class="props">${P.map((p, i) => `<span>${esc(p.name)}</span><b>${fmt(d.q[i])}</b>`).join("")}</div>
+    <div style="color:var(--muted);font-size:12px;margin-top:8px">Image #${d.idx} · full-opacity bar = true class</div>`;
+}
+
+// ---- wiring ----
+function syncButtons() {
+  document.querySelectorAll(".seg[data-key]").forEach(g => g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(String(S[g.dataset.key]) === b.dataset.v))));
+}
+document.querySelectorAll(".seg[data-key]").forEach(g => g.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const k = g.dataset.key; S[k] = k === "split" ? +b.dataset.v : b.dataset.v;
+  if (k === "rows" && S.sel && S.sel.rows && S.sel.rows !== S.rows) S.sel = { kind: "wrong" };
+  if (k === "sort") S.shown = 96;
+  renderAll();
+}));
+$("sel-wrong").addEventListener("click", () => select({ kind: "wrong" }));
+$("more").addEventListener("click", () => { S.shown += 96; renderGallery(); });
+$("tbl-toggle").addEventListener("click", e => { const t = $("cm-table"); t.hidden = !t.hidden; e.target.setAttribute("aria-expanded", String(!t.hidden)); e.target.textContent = t.hidden ? "Show as table" : "Hide table"; });
+// property / class / map-colour selects
+$("prop-sel").innerHTML = P.map((p, i) => `<option value="${i}">${esc(p.name)}</option>`).join("");
+$("cls-sel").innerHTML = `<option value="all">All classes (correct vs wrong)</option><optgroup label="5 merged classes">` +
+  C5.map((c, i) => `<option value="5:${i}">${esc(c)}</option>`).join("") + `</optgroup><optgroup label="10 original classes">` +
+  ORDER10.map(i => `<option value="10:${i}">${esc(C10[i])}</option>`).join("") + "</optgroup>";
+$("map-col").innerHTML = `<option value="err">correct / mistake</option>` + P.map((p, i) => `<option value="${i}">${esc(p.name)}</option>`).join("");
+$("prop-sel").value = String(S.prop);
+$("cls-sel").value = S.cls;
+$("prop-sel").addEventListener("change", e => { S.prop = +e.target.value; renderProp(); });
+$("cls-sel").addEventListener("change", e => { S.cls = e.target.value; renderProp(); });
+$("map-col").addEventListener("change", e => { S.mapColor = e.target.value; renderEmb(); });
+function renderAll() { syncButtons(); renderTiles(); renderCM(); renderRecall(); renderCalib(); renderProp(); renderEmb(); renderGallery(); renderDetail(); }
+addEventListener("resize", () => renderEmb());
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderAll);
+renderAll();
+})();
+</script>
+</body>
+</html>

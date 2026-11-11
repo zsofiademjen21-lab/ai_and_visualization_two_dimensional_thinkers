@@ -1,11 +1,26 @@
 {
-    "team_name": "Team Name",
+    "team_name": "Two Dimensional Thinkers",
     "students": [
         {
-            "first_name": "First",
-            "last_name": "Last",
+            "first_name": "Zsófia",
+            "last_name": "Demjén-Nagy",
             "workload": 0.25
         },
-        // ...add a record for each student
+         {
+            "first_name": "Livia",
+            "last_name": "Koch",
+            "workload": 0.25
+        },
+         {
+            "first_name": "Daniel",
+            "last_name": "Morgunov",
+            "workload": 0.25
+        },
+         {
+            "first_name": "Bence",
+            "last_name": "Kovács",
+            "workload": 0.25
+        }
+        
     ]
 } 
