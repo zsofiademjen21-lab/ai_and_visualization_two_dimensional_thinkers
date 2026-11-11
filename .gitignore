@@ -218,7 +218,4 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-
-# Project data / weights (re-downloadable)
-data/
-models/
+human_only/results/validation_images.npy
