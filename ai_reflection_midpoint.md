@@ -53,9 +53,33 @@ Checking is quicker than building, but it is real work. It only works if you kno
 - Its judgement of images is not a substitute for a human check.
 - Without clear instructions, its first output is often too detailed for presenting.
 
-## Points to compare with the human-only pair
+## What the human-only pair did
 
-- Did they find the irregular-galaxy blind spot and the size/detail effect, and did they test the cause or only observe it?
-- Did they also see the colour pattern, and did they conclude that the model uses colour?
-- How did their visualisations differ? Ours are interactive and linked, and include before/after image pairs.
-- Did they find something we missed because the AI steered us in a particular direction?
+Daniel and Bence worked in one Jupyter notebook ([human_only/](human_only/README.md)). They rebuilt the same validation split and also got 92.9%. Their analysis used only real images and model outputs:
+- accuracy per class, a confusion matrix and the 10 original subtypes;
+- confidence of correct vs wrong predictions, per class;
+- accuracy against four simple image properties (distance, size, core brightness, redness);
+- grids of example images (most confident mistakes, most common mistakes, correct vs wrong per class);
+- a visual check of all 91 wrongly predicted irregular galaxies ("looks disturbed" or "looks normal");
+- a near/far × blue/red split of the irregular galaxies.
+
+## Comparison with the human-only pair
+
+**Same core result.** Both pairs found the irregular-galaxy blind spot: 56% correct, with the mistakes going mostly to Spiral and Elliptical, and the class being rare in training (876 images). Both found that the model is confidently wrong on this class. Both also saw the smaller Cigar-shaped elliptical problem: they found it confused with Edge-on (9% of 53), we found its accuracy drops from training to new images (97% to 85%).
+
+**Size and detail.** They saw that irregular accuracy changes with distance (73% near vs 39% at medium distance), but they only observed it. We tested it by shrinking and blurring spirals, which showed that *loss of detail* turns galaxies into "Elliptical".
+
+**Colour: same pattern, opposite conclusion.** Both pairs saw that red irregular galaxies are called Elliptical much more often than blue ones. They concluded that "colour matters more than distance" and that the model has learned something like "red and smooth means Elliptical". Our recolouring test showed that making red irregular galaxies bluer does not change the answer (33% vs 32% called Elliptical). So colour goes along with the mistakes but does not cause them; a smoother shape is the more likely reason. This is the clearest case where testing with edited images changed the conclusion.
+
+**Labels: visual judgement vs volunteer votes.** Their visual check found that only 24 of the 91 mistakes look disturbed, and 34 of the 36 "called Elliptical" look like normal ellipticals. They concluded that the low irregular accuracy is partly a label problem. Our first visual impression pointed the same way (about 16 of 40 confident mistakes looked mislabelled). The volunteers' votes did not support this: wrong labels explain only about 1 in 10 mistakes, and no irregular mistake had votes backing the model. Both pairs' visual judgements overstated label noise. The disturbances are often faint and hard to see at this image size, but the volunteers did see them.
+
+**Visualisations.** Theirs are static charts and image grids that are easy to read and explain one finding each. Ours are interactive and linked (map, calibration, gallery) and include before/after image pairs. Ours allow more exploration, but they took much longer to check and needed simplifying before we could present them.
+
+**What they found that we did not.**
+- The per-class confidence histograms make the "confidently wrong on irregular" point very directly: for irregular galaxies, wrong and correct predictions have about the same confidence.
+- The 2×2 near/far × blue/red table is a simple and clear way to separate two linked factors, without any image editing.
+- A concrete Phase II question: saliency maps for irregular galaxies that really look disturbed.
+
+**What we found that they did not.** The detail-loss cause, the instability of irregular answers under rotation and shifting, the gap between training and new images, the two-class "bridges" on the map, the label check with volunteer votes, and (with ChatGPT) the drop to 64% on images from other telescopes.
+
+**What this says about AI assistance.** Both pairs reached the same main finding, so AI was not needed to find the blind spot. AI widened the analysis and, more importantly, pushed us to test causes. Without the tests, both pairs drew the same wrong conclusion about colour and label noise from what they observed. The human-only pair's work is smaller but more focused, and each figure answers one question.
