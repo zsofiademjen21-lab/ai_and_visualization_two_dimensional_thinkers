@@ -221,7 +221,8 @@ __marimo__/
 human_only/results/validation_images.npy
 
 data/
-models/
+models/*
+!models/*.ckpt
 # OS / Office junk
 .DS_Store
 ~$*
