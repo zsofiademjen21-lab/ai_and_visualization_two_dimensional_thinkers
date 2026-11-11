@@ -220,4 +220,5 @@ __marimo__/
 .streamlit/secrets.toml
 human_only/results/validation_images.npy
 
-data
+data/
+models/
