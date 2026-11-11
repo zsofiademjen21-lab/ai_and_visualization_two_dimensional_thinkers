@@ -222,3 +222,6 @@ human_only/results/validation_images.npy
 
 data/
 models/
+# OS / Office junk
+.DS_Store
+~$*

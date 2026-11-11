@@ -15,13 +15,14 @@ Group project for the course *AI and Visualization*. We use visualisation to und
 | Daniel Morgunov | k12141900 |
 | Bence Kovács | K12245534 |
 
-Zsófia and Livia form the AI-aided pair. Details are in [`team-info.json`](team-info.json) and [`workload.json`](workload.json).
+Zsófia and Livia form the AI-aided pair; Daniel and Bence form the human-only pair. Details are in [`team-info.json`](team-info.json) and [`workload.json`](workload.json).
 
 ## Where to start
 
 - **Phase I report:** [`ai_aided/report_phase1.md`](ai_aided/report_phase1.md). It covers both AI-aided parts (ChatGPT and Claude Code) and compares them.
 - **Key takeaways page:** open [`ai_aided/claude/vis/findings.html`](ai_aided/claude/vis/findings.html) in a browser.
 - **Interactive explorer:** open [`ai_aided/claude/vis/explorer.html`](ai_aided/claude/vis/explorer.html) in a browser (confusion matrix, map of the model's answers, calibration, image gallery).
+- **Human-only pair's Phase I work:** [`human_only/README.md`](human_only/README.md), with all code and figures in [`human_only/Phase1_Human_Only.ipynb`](human_only/Phase1_Human_Only.ipynb).
 - **AI reflection (midpoint):** [`ai_reflection_midpoint.md`](ai_reflection_midpoint.md).
 
 The HTML pages are self-contained: they need no server and no downloads.
@@ -33,8 +34,9 @@ The HTML pages are self-contained: they need no server and no downloads.
 | [`ai_aided/`](ai_aided/) | AI-aided pair's Phase I work and report (see [its README](ai_aided/README.md)) |
 | [`ai_aided/chatgpt/`](ai_aided/chatgpt/) | ChatGPT part: 25 independent galaxy images and image-editing tests on one image (figures only) |
 | [`ai_aided/claude/`](ai_aided/claude/) | Claude Code part: full Galaxy10 validation set, with code (`src/`), results (`results/`), interactive pages (`vis/`) and one chart per takeaway (`figures/`) |
+| [`human_only/`](human_only/) | Human-only pair's Phase I work: notebook, figures (`figures/`) and results (`results/`) |
 | [`ai-interactions/ai-use-log.md`](ai-interactions/ai-use-log.md) | AI-use log: prompts, AI answers and what we checked or changed |
-| [`ai_reflection_midpoint.md`](ai_reflection_midpoint.md) | Midpoint reflection on working with AI |
+| [`ai_reflection_midpoint.md`](ai_reflection_midpoint.md) | Midpoint reflection on working with AI, including a comparison with the human-only pair |
 | `data/`, `models/` | Shared dataset and model checkpoint (gitignored, see below) |
 
 ## Reproducing the results
@@ -47,6 +49,8 @@ mkdir -p data
 curl -L -o data/Galaxy10_DECals.h5 https://zenodo.org/records/10845026/files/Galaxy10_DECals.h5
 ```
 
-The checkpoint downloads into `models/` automatically on the first run. The `zoobot` package is **not** needed: `ai_aided/claude/src/model.py` rebuilds the network with plain `timm` and loads the checkpoint with `weights_only=True`.
+The checkpoint downloads into `models/` automatically on the first run. For the AI-aided code the `zoobot` package is **not** needed: `ai_aided/claude/src/model.py` rebuilds the network with plain `timm` and loads the checkpoint with `weights_only=True`.
 
 The full pipeline (inference, measurements, image-editing tests, data for the pages) is described step by step in [`ai_aided/README.md`](ai_aided/README.md#pipeline).
+
+The human-only notebook loads the model with `zoobot` (`pip install zoobot[pytorch]`) and expects the same `data/` and `models/` folders; see [`human_only/README.md`](human_only/README.md#running-the-notebook).

@@ -98,9 +98,9 @@ tails.
 
 ```bash
 source venv/bin/activate
-jupyter notebook phase1/Phase1_Human_Only.ipynb
+jupyter notebook human_only/Phase1_Human_Only.ipynb
 ```
 
-The notebook expects `data/Galaxy10_DECals.h5` and `model/zoobot_finetuned.ckpt` one folder above
+The notebook expects `data/Galaxy10_DECals.h5` and `models/zoobot_finetuned.ckpt` one folder above
 it. The first run reads the images from the `.h5` file once and caches them in
 `results/validation_images.npy` (about 700 MB, not in git).
